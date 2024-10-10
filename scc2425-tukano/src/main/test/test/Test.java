@@ -1,16 +1,16 @@
-package test;
+package main.test.test;
 
 import java.io.File;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.Random;
 
-import tukano.api.Result;
-import tukano.api.User;
-import tukano.clients.rest.RestBlobsClient;
-import tukano.clients.rest.RestShortsClient;
-import tukano.clients.rest.RestUsersClient;
-import tukano.impl.rest.TukanoRestServer;
+import main.java.tukano.api.Result;
+import main.java.tukano.api.User;
+import main.test.tukano.clients.rest.RestBlobsClient;
+import main.test.tukano.clients.rest.RestShortsClient;
+import main.test.tukano.clients.rest.RestUsersClient;
+import main.java.tukano.impl.rest.TukanoRestServer;
 
 public class Test {
 	
@@ -46,7 +46,7 @@ public class Test {
 		 show(users.searchUsers(""));
 		
 		
-		Result<tukano.api.Short> s1, s2;
+		Result<main.java.tukano.api.Short> s1, s2;
 
 		show(s2 = shorts.createShort("liskov", "54321"));		
 		show(s1 = shorts.createShort("wales", "12345"));

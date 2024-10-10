@@ -1,28 +1,28 @@
-package tukano.impl;
+package main.java.tukano.impl;
 
 import static java.lang.String.format;
-import static tukano.api.Result.error;
-import static tukano.api.Result.errorOrResult;
-import static tukano.api.Result.errorOrValue;
-import static tukano.api.Result.errorOrVoid;
-import static tukano.api.Result.ok;
-import static tukano.api.Result.ErrorCode.BAD_REQUEST;
-import static tukano.api.Result.ErrorCode.FORBIDDEN;
-import static utils.DB.getOne;
+import static main.java.tukano.api.Result.error;
+import static main.java.tukano.api.Result.errorOrResult;
+import static main.java.tukano.api.Result.errorOrValue;
+import static main.java.tukano.api.Result.errorOrVoid;
+import static main.java.tukano.api.Result.ok;
+import static main.java.tukano.api.Result.ErrorCode.BAD_REQUEST;
+import static main.java.tukano.api.Result.ErrorCode.FORBIDDEN;
+import static main.java.utils.DB.getOne;
 
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import tukano.api.Blobs;
-import tukano.api.Result;
-import tukano.api.Short;
+import main.java.tukano.api.Blobs;
+import main.java.tukano.api.Result;
+import main.java.tukano.api.Short;
 import tukano.api.Shorts;
-import tukano.api.User;
-import tukano.impl.data.Following;
-import tukano.impl.data.Likes;
-import tukano.impl.rest.TukanoRestServer;
-import utils.DB;
+import main.java.tukano.api.User;
+import main.java.tukano.impl.data.Following;
+import main.java.tukano.impl.data.Likes;
+import main.java.tukano.impl.rest.TukanoRestServer;
+import main.java.utils.DB;
 
 public class JavaShorts implements Shorts {
 

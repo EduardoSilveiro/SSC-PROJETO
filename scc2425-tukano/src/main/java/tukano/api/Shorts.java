@@ -1,5 +1,8 @@
 package tukano.api;
 
+import main.java.tukano.api.Result;
+import main.java.tukano.api.Short;
+
 import java.util.List;
 
 /**
@@ -18,16 +21,16 @@ public interface Shorts {
 	String NAME = "shorts";
 	
 	/**
-	 * Creates a new short, generating its unique identifier. 
-	 * The result short will include the blob storage location where the media should be uploaded.
-	 * 
-	 * @param userId - the owner of the new short
-	 * @param password - the password of owner of the new short
-	 * @return (OK, Short) if the short was created;
-	 * NOT FOUND, if the owner of the short does not exist;
-	 * FORBIDDEN, if the password is not correct;
-	 * BAD_REQUEST, otherwise.
-	 */
+     * Creates a new short, generating its unique identifier.
+     * The result short will include the blob storage location where the media should be uploaded.
+     *
+     * @param userId   - the owner of the new short
+     * @param password - the password of owner of the new short
+     * @return (OK, Short) if the short was created;
+     * NOT FOUND, if the owner of the short does not exist;
+     * FORBIDDEN, if the password is not correct;
+     * BAD_REQUEST, otherwise.
+     */
 	Result<Short> createShort(String userId, String password);
 
 	/**

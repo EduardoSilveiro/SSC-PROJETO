@@ -1,14 +1,16 @@
-package tukano.clients.rest;
+package main.test.tukano.clients.rest;
 
 import java.util.List;
 
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.MediaType;
-import tukano.api.Result;
-import tukano.api.Short;
+import main.java.tukano.api.Result;
+import main.java.tukano.api.Short;
+import main.java.tukano.api.Result;
+import main.java.tukano.api.Short;
 import tukano.api.Shorts;
-import tukano.api.rest.RestShorts;
+import main.java.tukano.api.rest.RestShorts;
 
 public class RestShortsClient extends RestClient implements Shorts{
 

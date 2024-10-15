@@ -4,17 +4,17 @@ main\java\tukano\api\Blobs.class
 main\test\tukano\clients\rest\RestUsersClient.class
 main\java\utils\Props.class
 main\test\tukano\clients\rest\RestShortsClient$1.class
-main\java\tukano\azure\blob\BlobStorageLayer$BlobStoreLayer.class
 main\java\tukano\api\OkResult.class
 main\java\tukano\api\Result.class
 main\java\tukano\api\Short.class
-main\java\tukano\azure\db\CosmosDBLayer.class
 main\java\tukano\impl\storage\BlobStorage.class
 main\java\utils\Random.class
 main\java\tukano\impl\rest\utils\GenericExceptionMapper.class
+main\java\tukano\azure\cache\RedisCache.class
 main\java\utils\Args.class
 main\java\tukano\impl\rest\RestResource$1.class
 main\java\utils\Hibernate.class
+main\java\tukano\azure\db\ShortsDBLayer.class
 main\java\utils\Hex.class
 main\test\test\Test.class
 main\java\tukano\impl\rest\utils\CustomLoggingFilter.class
@@ -26,6 +26,7 @@ main\java\tukano\impl\rest\RestShortsResource.class
 main\test\tukano\clients\rest\RestShortsClient$4.class
 main\java\tukano\api\rest\RestBlobs.class
 main\java\tukano\impl\rest\RestUsersResource.class
+main\java\utils\Constants.class
 tukano\api\Shorts.class
 main\java\tukano\impl\data\Following.class
 main\java\utils\DB.class
@@ -42,7 +43,9 @@ main\java\tukano\impl\data\Likes.class
 main\java\tukano\impl\rest\TukanoRestServer.class
 main\java\utils\Queues.class
 main\test\tukano\clients\rest\RestShortsClient$3.class
+main\java\tukano\azure\db\UserDBLayer.class
 main\java\utils\TryCatch$ThrowableSupplier.class
+main\java\utils\Session.class
 main\java\utils\JSON.class
 main\test\tukano\clients\rest\RestBlobsClient.class
 main\java\utils\IP.class

@@ -5,6 +5,7 @@ public enum Constants {
             "Y2TBwQZcPSyzjtt3DerktHMEVWr0MZfrcriJ8w7gffqCcQMtAdoSyL3XHgCxU2HLmhGo6fxm3EMbACDbLpWZdg==", "scc2324",
             "scc2324cache60353.redis.cache.windows.net", "KWLleeCMwMy1AL7WngYv0JSsVKfFLdJUlAzCaPWF0cM=");
 
+
     private final String dbUrl;
     private final String dbKey;
     private final String dbName;

@@ -124,7 +124,7 @@ public class ShortsDBLayer {
         });
     }
 
-
+    /**
     public Result<Void> deleteShort(String shortId, String password) {
         return tryCatch(() -> {
             Result<Short> shortResult = getShort(shortId);
@@ -144,6 +144,7 @@ public class ShortsDBLayer {
             });
         });
     }
+     **/
 
     public Result<List<String>> followers(String userId, String password) {
         return tryCatch(() -> {
@@ -178,8 +179,8 @@ public class ShortsDBLayer {
         });
     }
 
+    /**
     public Result<Void> follow(String userId1, String userId2, boolean isFollowing, String password) {
-
         return tryCatch(() -> {
             var following = new Following(userId1, userId2);
             return errorOrVoid(okUser(userId1, password), () -> {
@@ -192,5 +193,6 @@ public class ShortsDBLayer {
             });
         });
     }
+     **/
 
 }

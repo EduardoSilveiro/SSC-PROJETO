@@ -11,6 +11,8 @@ import tukano.clients.rest.RestBlobsClient;
 import tukano.clients.rest.RestShortsClient;
 import tukano.clients.rest.RestUsersClient;
 import tukano.impl.rest.TukanoRestServer;
+import org.glassfish.jersey.jackson.JacksonFeature;
+
 
 public class Test {
 	
@@ -28,7 +30,7 @@ public class Test {
 		}).start();
 
 		
-		Thread.sleep(1000);
+		Thread.sleep(10000);
 		
 		var serverURI = String.format("http://localhost:%s/rest", TukanoRestServer.PORT);
 		

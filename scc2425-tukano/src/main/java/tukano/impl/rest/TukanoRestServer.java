@@ -3,6 +3,7 @@ package tukano.impl.rest;
 import java.net.URI;
 import java.util.logging.Logger;
 
+import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
@@ -37,7 +38,7 @@ public class TukanoRestServer {
 		config.register(RestBlobsResource.class);
 		config.register(RestUsersResource.class); 
 		config.register(RestShortsResource.class);
-		
+		config.register(new JacksonFeature());
 		JdkHttpServerFactory.createHttpServer( URI.create(serverURI.replace(IP.hostname(), INETADDR_ANY)), config);
 		
 		Log.info(String.format("Tukano Server ready @ %s\n",  serverURI));

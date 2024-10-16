@@ -1,19 +1,18 @@
-package main.java.tukano.impl;
+package tukano.impl;
 
 import static java.lang.String.format;
-import static main.java.tukano.api.Result.error;
-import static main.java.tukano.api.Result.ErrorCode.FORBIDDEN;
+import static tukano.api.Result.error;
+import static tukano.api.Result.ErrorCode.FORBIDDEN;
 
-import java.util.function.Consumer;
 import java.util.logging.Logger;
 
-import main.java.tukano.api.Blobs;
-import main.java.tukano.api.Result;
-import main.java.tukano.impl.rest.TukanoRestServer;
-import main.java.tukano.impl.storage.BlobStorage;
-import main.java.tukano.impl.storage.FilesystemStorage;
-import main.java.utils.Hash;
-import main.java.utils.Hex;
+import tukano.api.Blobs;
+import tukano.api.Result;
+import tukano.impl.rest.TukanoRestServer;
+import tukano.impl.storage.BlobStorage;
+import tukano.impl.storage.FilesystemStorage;
+import utils.Hash;
+import utils.Hex;
 
 public class JavaBlobs implements Blobs {
 	
@@ -54,16 +53,6 @@ public class JavaBlobs implements Blobs {
 		return storage.read( toPath( blobId ) );
 	}
 
-
-	public Result<Void> downloadToSink(String blobId, Consumer<byte[]> sink, String token) {
-		Log.info(() -> format("downloadToSink : blobId = %s, token = %s\n", blobId, token));
-
-		if( ! validBlobId( blobId, token ) )
-			return error(FORBIDDEN);
-
-		return storage.read( toPath(blobId), sink);
-	}
-
 	@Override
 	public Result<Void> delete(String blobId, String token) {
 		Log.info(() -> format("delete : blobId = %s, token=%s\n", blobId, token));
@@ -85,15 +74,10 @@ public class JavaBlobs implements Blobs {
 	}
 	
 	private boolean validBlobId(String blobId, String token) {		
-		System.out.println( toURL(blobId));
-		return Token.isValid(token, toURL(blobId));
+		return Token.isValid(token, blobId);
 	}
 
 	private String toPath(String blobId) {
 		return blobId.replace("+", "/");
-	}
-	
-	private String toURL( String blobId ) {
-		return baseURI + blobId ;
 	}
 }

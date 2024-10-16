@@ -1,8 +1,8 @@
-package main.java.tukano.api;
+package tukano.api;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import main.java.tukano.impl.Token;
+import tukano.impl.Token;
 
 /**
  * Represents a Short video uploaded by an user.

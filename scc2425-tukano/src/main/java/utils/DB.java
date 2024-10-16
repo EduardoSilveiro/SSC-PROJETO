@@ -1,4 +1,4 @@
-package main.java.utils;
+package utils;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -6,7 +6,7 @@ import java.util.function.Function;
 
 import org.hibernate.Session;
 
-import main.java.tukano.api.Result;
+import tukano.api.Result;
 
 public class DB {
 

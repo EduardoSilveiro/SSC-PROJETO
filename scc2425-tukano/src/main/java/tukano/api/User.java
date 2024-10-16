@@ -1,4 +1,4 @@
-package main.java.tukano.api;
+package tukano.api;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

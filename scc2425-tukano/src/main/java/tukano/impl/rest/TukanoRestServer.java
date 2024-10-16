@@ -1,4 +1,4 @@
-package main.java.tukano.impl.rest;
+package tukano.impl.rest;
 
 import java.net.URI;
 import java.util.logging.Logger;
@@ -6,10 +6,9 @@ import java.util.logging.Logger;
 import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
-import main.java.tukano.impl.Token;
-import main.java.utils.Args;
-import main.java.utils.IP;
-import main.java.utils.Props;
+import tukano.impl.Token;
+import utils.Args;
+import utils.IP;
 
 
 public class TukanoRestServer {

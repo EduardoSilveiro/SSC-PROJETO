@@ -1,4 +1,4 @@
-package main.java.utils;
+package utils;
 
 import java.io.File;
 import java.util.List;
@@ -11,8 +11,8 @@ import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.exception.ConstraintViolationException;
 
-import main.java.tukano.api.Result;
-import main.java.tukano.api.Result.ErrorCode;
+import tukano.api.Result;
+import tukano.api.Result.ErrorCode;
 
 /**
  * A helper class to perform POJO (Plain Old Java Objects) persistence, using

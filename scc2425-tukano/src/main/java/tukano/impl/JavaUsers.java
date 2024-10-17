@@ -10,37 +10,81 @@ import static tukano.api.Result.ErrorCode.FORBIDDEN;
 
 import java.util.List;
 import java.util.concurrent.Executors;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 
+import com.azure.cosmos.*;
 import tukano.api.Result;
 import tukano.api.User;
 import tukano.api.Users;
+import utils.Constants;
 import utils.DB;
+
+import com.azure.cosmos.models.CosmosItemResponse;
 
 public class JavaUsers implements Users {
 	
 	private static Logger Log = Logger.getLogger(JavaUsers.class.getName());
-
+	private static final String CONNECTION_URL = Constants.eduardoConst.getDbUrl();
+	private static final String DB_KEY = Constants.eduardoConst.getDbKey();
+	private static final String DB_NAME = Constants.eduardoConst.getDbName();
 	private static Users instance;
-	
-	synchronized public static Users getInstance() {
-		if( instance == null )
-			instance = new JavaUsers();
+
+	private CosmosClient client;
+	private CosmosDatabase db;
+	private CosmosContainer users;
+
+	public static synchronized Users getInstance() {
+		if (instance != null)
+			return instance;
+
+		CosmosClient client = new CosmosClientBuilder()
+				.endpoint(CONNECTION_URL)
+				.key(DB_KEY)
+				// .directMode()
+				.gatewayMode()
+				// replace by .directMode() for better performance
+				.consistencyLevel(ConsistencyLevel.SESSION)
+				.connectionSharingAcrossClientsEnabled(true)
+				.contentResponseOnWriteEnabled(true)
+				.buildClient();
+		instance = new JavaUsers(client);
 		return instance;
+
 	}
-	
-	private JavaUsers() {}
-	
+
+	public JavaUsers(CosmosClient client) {
+		this.client = client;
+	}
+	<T> Result<T> tryCatch( Supplier<T> supplierFunc) {
+		try {
+			init();
+			return Result.ok(supplierFunc.get());
+		} catch( CosmosException ce ) {
+			//ce.printStackTrace();
+			return Result.error(Result.ErrorCode.valueOf(String.valueOf(ce.getStatusCode())));
+		} catch( Exception x ) {
+			x.printStackTrace();
+			return Result.error( Result.ErrorCode.INTERNAL_ERROR);
+		}
+	}
+
+	private synchronized void init() {
+		if (db != null)
+			return;
+		db = client.getDatabase(DB_NAME);
+		users = db.getContainer("users");
+
+	}
+
 	@Override
 	public Result<String> createUser(User user) {
 		Log.info(() -> format("createUser : %s\n", user));
 
-		if( badUserInfo( user ) )
-				return error(BAD_REQUEST);
-
-		return errorOrValue( DB.insertOne( user), user.getUserId() );
+			CosmosItemResponse<User> response = users.createItem(user);
+			return Result.ok(null);
 	}
-
+	
 	@Override
 	public Result<User> getUser(String userId, String pwd) {
 		Log.info( () -> format("getUser : userId = %s, pwd = %s\n", userId, pwd));

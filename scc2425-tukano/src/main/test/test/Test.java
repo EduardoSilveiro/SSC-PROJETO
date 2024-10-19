@@ -102,7 +102,7 @@ public class Test {
 //
 //		});
 
-		show(users.deleteUser("wales", "12345"));
+		//show(users.deleteUser("wales", "12345"));
 
 		System.exit(0);
 	}

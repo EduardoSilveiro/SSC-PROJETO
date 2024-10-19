@@ -86,18 +86,21 @@ public class JavaUsers implements Users {
 	@Override
 	public Result<String> createUser(User user) {
 		Log.info(() -> format("createUser : %s\n", user));
+		if (user.getUserId() == null || user.getPwd() == null || user.getEmail() == null || user.getDisplayName() == null) {
+			Log.info("User data is incomplete: " + user);
+			return Result.error(Result.ErrorCode.CONFLICT);
+		}
 		try {
 			init();
 			UserDAO userDAO = new UserDAO(user);
-			return tryCatch( () -> users.createItem(userDAO).getItem().toString());
-
+			Log.info(() -> format("UserDAO : %s\n", userDAO));
+			return tryCatch(() -> users.createItem(userDAO).getItem().toString());
 		} catch (Exception x) {
 			Log.info("Error creating user: " + x.getMessage());
 			x.printStackTrace();
 			return Result.error(Result.ErrorCode.INTERNAL_ERROR);
 		}
 	}
-
 
 	@Override
 	public Result<User> getUser(String userId, String pwd) {

@@ -135,12 +135,10 @@ public class JavaUsers implements Users {
 			CosmosItemResponse<UserDAO> response = users.readItem(userId, new PartitionKey(userId), UserDAO.class);
 			UserDAO userDAO = response.getItem();
 
-			// Valide a senha
 			if (!userDAO.getPwd().equals(pwd)) {
 				return Result.error(Result.ErrorCode.CONFLICT);
 			}
 
-			// Delete o usuário
 			users.deleteItem(userId, new PartitionKey(userId),new CosmosItemRequestOptions());
 
 			Executors.defaultThreadFactory().newThread(() -> {

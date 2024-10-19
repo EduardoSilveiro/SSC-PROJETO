@@ -50,7 +50,7 @@ public class Test {
 //		show(users.createUser( new User("jo2jjao", "54321", "liskov@mit.edu", "Barbara Liskov") ));
 
 		//show(users.deleteUser("eduardo", "54321"));
-		show(users.deleteUser("jo2jjao", "54321"));
+		show(users.deleteUser("liskov", "54321"));
 
 
 //

@@ -79,7 +79,6 @@ public class JavaUsers implements Users {
 		//db = client.getDatabase(DB_NAME);
 		//users = db.getContainer("users");
 		users = client.getDatabase("scc2324").getContainer("users");
-		System.out.println("DEUUU OUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU BNAOOOOOOOOOOOOOOOOOOOOOO?:"+users);
 
 	}
 
@@ -126,20 +125,37 @@ public class JavaUsers implements Users {
 	public Result<User> deleteUser(String userId, String pwd) {
 		Log.info(() -> format("deleteUser : userId = %s, pwd = %s\n", userId, pwd));
 
-		if (userId == null || pwd == null )
-			return error(BAD_REQUEST);
+		if (userId == null || pwd == null) {
+			return Result.error(Result.ErrorCode.BAD_REQUEST);
+		}
 
-		return errorOrResult( validatedUserOrError(DB.getOne( userId, User.class), pwd), user -> {
+		try {
+			init();
 
-			// Delete user shorts and related info asynchronously in a separate thread
-			Executors.defaultThreadFactory().newThread( () -> {
+			CosmosItemResponse<UserDAO> response = users.readItem(userId, new PartitionKey(userId), UserDAO.class);
+			UserDAO userDAO = response.getItem();
+
+			// Valide a senha
+			if (!userDAO.getPwd().equals(pwd)) {
+				return Result.error(Result.ErrorCode.CONFLICT);
+			}
+
+			// Delete o usuário
+			users.deleteItem(userId, new PartitionKey(userId),new CosmosItemRequestOptions());
+
+			Executors.defaultThreadFactory().newThread(() -> {
 				JavaShorts.getInstance().deleteAllShorts(userId, pwd, Token.get(userId));
 				JavaBlobs.getInstance().deleteAllBlobs(userId, Token.get(userId));
 			}).start();
-			
-			return DB.deleteOne( user);
-		});
+
+			return Result.ok(userDAO);
+		} catch (CosmosException e) {
+			Log.info("Error deleting user: " + e.getMessage());
+			e.printStackTrace();
+			return Result.error(Result.ErrorCode.INTERNAL_ERROR);
+		}
 	}
+
 
 	@Override
 	public Result<List<User>> searchUsers(String pattern) {

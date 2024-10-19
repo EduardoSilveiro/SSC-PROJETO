@@ -6,12 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="3c442bf9-271c-4bdd-b717-b59d56f8b66c" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tukano/api/UserDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tukano/api/UserDAO.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/tukano/impl/JavaUsers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tukano/impl/JavaUsers.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/test/test/Test.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/test/test/Test.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/tukano/api/UserDAO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/api/UserDAO.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/tukano/impl/JavaUsers.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/impl/JavaUsers.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/test/Test.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/test-classes/test/Test.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

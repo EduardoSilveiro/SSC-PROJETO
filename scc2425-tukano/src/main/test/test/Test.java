@@ -42,13 +42,16 @@ public class Test {
 		var shorts = new RestShortsClient(serverURI);
 
 
-		users.createUser( new User("wales", "12345", "jimmy@wikipedia.pt", "Jimmy Wales")) ;
+		//users.createUser( new User("wales", "12345", "jimmy@wikipedia.pt", "Jimmy Wales")) ;
+//		show(users.createUser( new User("liskov", "54321", "liskov@mit.edu", "Barbara Liskov") ));
+//		show(users.createUser( new User("eduardo", "54321", "liskov@mit.edu", "Barbara Liskov") ));
+//		show(users.createUser( new User("joao", "54321", "liskov@mit.edu", "Barbara Liskov") ));
+//		show(users.createUser( new User("jojjao", "54321", "liskov@mit.edu", "Barbara Liskov") ));
+//		show(users.createUser( new User("jo2jjao", "54321", "liskov@mit.edu", "Barbara Liskov") ));
 
-		show(users.createUser( new User("liskov", "54321", "liskov@mit.edu", "Barbara Liskov") ));
-		show(users.createUser( new User("eduardo", "54321", "liskov@mit.edu", "Barbara Liskov") ));
-		show(users.createUser( new User("joao", "54321", "liskov@mit.edu", "Barbara Liskov") ));
-		show(users.createUser( new User("jojjao", "54321", "liskov@mit.edu", "Barbara Liskov") ));
-		show(users.createUser( new User("jo2jjao", "54321", "liskov@mit.edu", "Barbara Liskov") ));
+		//show(users.deleteUser("eduardo", "54321"));
+		show(users.deleteUser("jo2jjao", "54321"));
+
 
 //
 //		show(users.updateUser("wales", "12345", new User("wales", "12345", "jimmy@wikipedia.com", "" ) ));

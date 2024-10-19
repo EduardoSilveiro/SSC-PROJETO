@@ -41,56 +41,60 @@ public class Test {
 		var users = new RestUsersClient( serverURI);
 		var shorts = new RestShortsClient(serverURI);
 
-		show(users.createUser( new User("wales", "12345", "jimmy@wikipedia.pt", "Jimmy Wales") ));
+
+		users.createUser( new User("wales", "12345", "jimmy@wikipedia.pt", "Jimmy Wales")) ;
 
 		show(users.createUser( new User("liskov", "54321", "liskov@mit.edu", "Barbara Liskov") ));
+		show(users.createUser( new User("eduardo", "54321", "liskov@mit.edu", "Barbara Liskov") ));
+		show(users.createUser( new User("joao", "54321", "liskov@mit.edu", "Barbara Liskov") ));
 
-		show(users.updateUser("wales", "12345", new User("wales", "12345", "jimmy@wikipedia.com", "" ) ));
-
-
-		show(users.searchUsers(""));
-
-
-		Result<tukano.api.Short> s1, s2;
-
-		show(s2 = shorts.createShort("liskov", "54321"));
-		show(s1 = shorts.createShort("wales", "12345"));
-		show(shorts.createShort("wales", "12345"));
-		show(shorts.createShort("wales", "12345"));
-		show(shorts.createShort("wales", "12345"));
-
-		var blobUrl = URI.create(s2.value().getBlobUrl());
-		System.out.println( "------->" + blobUrl );
-
-		var blobId = new File( blobUrl.getPath() ).getName();
-		System.out.println( "BlobID:" + blobId );
-
-		var token = blobUrl.getQuery().split("=")[1];
-
-		blobs.upload(blobUrl.toString(), randomBytes( 100 ), token);
-		var r = blobs.download(blobUrl.toString(), token);
-		System.out.println( Hex.of(Hash.sha256( r.value() )) + "-->DOWNLOADED HERE" + Hex.of(Hash.sha256( r.value() )));
-		var d = blobs.delete("http://Tomas:8080/rest/blobs/liskov+ab1a4521-91d2-42a5-ab67-ac7fd021a5ed?token=1729178892270-837017D4C2679C7760DEE522915D058C".toString(), null);
-
-		var s2id = s2.value().getShortId();
-
-		show(shorts.follow("liskov", "wales", true, "54321"));
-		show(shorts.followers("wales", "12345"));
-
-		show(shorts.like(s2id, "liskov", true, "54321"));
-		show(shorts.like(s2id, "liskov", true, "54321"));
-		show(shorts.likes(s2id , "54321"));
-		show(shorts.getFeed("liskov", "12345"));
-		show(shorts.getShort( s2id ));
-
-		show(shorts.getShorts( "wales" ));
-
-		show(shorts.followers("wales", "12345"));
-
-		show(shorts.getFeed("liskov", "12345"));
-
-		show(shorts.getShort( s2id ));
 //
+//		show(users.updateUser("wales", "12345", new User("wales", "12345", "jimmy@wikipedia.com", "" ) ));
+//
+//
+//		show(users.searchUsers(""));
+//
+//
+//		Result<tukano.api.Short> s1, s2;
+//
+//		show(s2 = shorts.createShort("liskov", "54321"));
+//		show(s1 = shorts.createShort("wales", "12345"));
+//		show(shorts.createShort("wales", "12345"));
+//		show(shorts.createShort("wales", "12345"));
+//		show(shorts.createShort("wales", "12345"));
+//
+//		var blobUrl = URI.create(s2.value().getBlobUrl());
+//		System.out.println( "------->" + blobUrl );
+//
+//		var blobId = new File( blobUrl.getPath() ).getName();
+//		System.out.println( "BlobID:" + blobId );
+//
+//		var token = blobUrl.getQuery().split("=")[1];
+//
+//		blobs.upload(blobUrl.toString(), randomBytes( 100 ), token);
+//		var r = blobs.download(blobUrl.toString(), token);
+//		System.out.println( Hex.of(Hash.sha256( r.value() )) + "-->DOWNLOADED HERE" + Hex.of(Hash.sha256( r.value() )));
+//		var d = blobs.delete("http://Tomas:8080/rest/blobs/liskov+ab1a4521-91d2-42a5-ab67-ac7fd021a5ed?token=1729178892270-837017D4C2679C7760DEE522915D058C".toString(), null);
+//
+//		var s2id = s2.value().getShortId();
+//
+//		show(shorts.follow("liskov", "wales", true, "54321"));
+//		show(shorts.followers("wales", "12345"));
+//
+//		show(shorts.like(s2id, "liskov", true, "54321"));
+//		show(shorts.like(s2id, "liskov", true, "54321"));
+//		show(shorts.likes(s2id , "54321"));
+//		show(shorts.getFeed("liskov", "12345"));
+//		show(shorts.getShort( s2id ));
+//
+//		show(shorts.getShorts( "wales" ));
+//
+//		show(shorts.followers("wales", "12345"));
+//
+//		show(shorts.getFeed("liskov", "12345"));
+//
+//		show(shorts.getShort( s2id ));
+////
 //
 //		blobs.forEach( b -> {
 //			var r = b.download(blobId);

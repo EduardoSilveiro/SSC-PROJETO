@@ -4,22 +4,25 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
 @Entity
-public class UserDAO {
+public class UserDAO extends  User {
+
+    @Id
     private String _rid; // Cosmos generated unique id of item
     private String _ts; // timestamp of the last update to the item
-    @Id
     private String userId;
     private String pwd;
     private String email;
     private String displayName;
 
-    public UserDAO() {}
-
+    public UserDAO(){
+        super();
+    }
     public UserDAO(String userId, String pwd, String email, String displayName) {
-        this.pwd = pwd;
-        this.email = email;
-        this.userId = userId;
-        this.displayName = displayName;
+        super(userId,pwd,email,displayName);
+    }
+
+    public UserDAO(User user) {
+        super(user.userId(), user.pwd(), user.email(), user.displayName());
     }
 
     public String get_rid() {

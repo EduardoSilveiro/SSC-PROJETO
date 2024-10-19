@@ -3,6 +3,7 @@ tukano\clients\rest\RestUsersClient.class
 tukano\impl\rest\RestResource$1.class
 tukano\impl\Token.class
 tukano\clients\rest\RestClient.class
+tukano\api\azure\UserDBLayer.class
 tukano\impl\rest\utils\CustomLoggingFilter.class
 utils\Random.class
 utils\TLS.class
@@ -37,6 +38,7 @@ tukano\api\rest\RestShorts.class
 tukano\api\Result$ErrorCode.class
 tukano\clients\rest\RestUsersClient$1.class
 tukano\impl\data\Likes.class
+tukano\impl\srv\UserResource.class
 utils\TryCatch.class
 utils\Hex.class
 tukano\api\rest\RestBlobs.class

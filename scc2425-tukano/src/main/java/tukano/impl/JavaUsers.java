@@ -14,16 +14,20 @@ import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 import com.azure.cosmos.*;
+import com.azure.cosmos.models.CosmosItemRequestOptions;
+import com.azure.cosmos.models.PartitionKey;
 import tukano.api.Result;
 import tukano.api.User;
+import tukano.api.UserDAO;
 import tukano.api.Users;
 import utils.Constants;
 import utils.DB;
 
 import com.azure.cosmos.models.CosmosItemResponse;
+import utils.Hash;
 
 public class JavaUsers implements Users {
-	
+
 	private static Logger Log = Logger.getLogger(JavaUsers.class.getName());
 	private static final String CONNECTION_URL = Constants.eduardoConst.getDbUrl();
 	private static final String DB_KEY = Constants.eduardoConst.getDbKey();
@@ -72,19 +76,29 @@ public class JavaUsers implements Users {
 	private synchronized void init() {
 		if (db != null)
 			return;
-		db = client.getDatabase(DB_NAME);
-		users = db.getContainer("users");
+		//db = client.getDatabase(DB_NAME);
+		//users = db.getContainer("users");
+		users = client.getDatabase("scc2324").getContainer("users");
+		System.out.println("DEUUU OUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU BNAOOOOOOOOOOOOOOOOOOOOOO?:"+users);
 
 	}
 
 	@Override
 	public Result<String> createUser(User user) {
 		Log.info(() -> format("createUser : %s\n", user));
+		try {
+			init();
+			UserDAO userDAO = new UserDAO(user);
+			return tryCatch( () -> users.createItem(userDAO).getItem().toString());
 
-			CosmosItemResponse<User> response = users.createItem(user);
-			return Result.ok(null);
+		} catch (Exception x) {
+			Log.info("Error creating user: " + x.getMessage());
+			x.printStackTrace();
+			return Result.error(Result.ErrorCode.INTERNAL_ERROR);
+		}
 	}
-	
+
+
 	@Override
 	public Result<User> getUser(String userId, String pwd) {
 		Log.info( () -> format("getUser : userId = %s, pwd = %s\n", userId, pwd));

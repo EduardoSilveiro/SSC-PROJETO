@@ -5,38 +5,35 @@ import jakarta.persistence.Id;
 
 @Entity
 public class User {
-	private String _rid; // Cosmos generated unique id of item
-	private String _ts; // timestamp of the last update to the item
 	@Id
+	private String id; // Identificador único do item
 	private String userId;
 	private String pwd;
-	private String email;	
+	private String email;
 	private String displayName;
 
-	public User() {}
-	
+	// Construtores, getters e setters...
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public User(){
+
+	}
 	public User(String userId, String pwd, String email, String displayName) {
+		this.id = userId; // Usando userId como id
 		this.pwd = pwd;
 		this.email = email;
 		this.userId = userId;
 		this.displayName = displayName;
 	}
 
-	public String get_rid() {
-		return _rid;
-	}
 
-	public void set_rid(String _rid) {
-		this._rid = _rid;
-	}
-
-	public String get_ts() {
-		return _ts;
-	}
-
-	public void set_ts(String _ts) {
-		this._ts = _ts;
-	}
 	public String getUserId() {
 		return userId;
 	}

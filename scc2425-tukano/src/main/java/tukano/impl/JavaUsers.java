@@ -100,26 +100,74 @@ public class JavaUsers implements Users {
 			return Result.error(Result.ErrorCode.INTERNAL_ERROR);
 		}
 	}
-
+	//NOT TESTED
 	@Override
 	public Result<User> getUser(String userId, String pwd) {
 		Log.info( () -> format("getUser : userId = %s, pwd = %s\n", userId, pwd));
 
-		if (userId == null)
-			return error(BAD_REQUEST);
+		if (userId == null || pwd == null) {
+			return Result.error(Result.ErrorCode.BAD_REQUEST);
+		}
+
+		try {
+			init();
+
+			CosmosItemResponse<UserDAO> response = users.readItem(userId, new PartitionKey(userId), UserDAO.class);
+			UserDAO userDAO = response.getItem();
+
+			if (!userDAO.getPwd().equals(pwd) || userDAO==null ) {
+				return Result.error(Result.ErrorCode.CONFLICT);
+			}
+
+
+			return Result.ok(userDAO);
+		} catch (CosmosException e) {
+			Log.info("Error deleting user: " + e.getMessage());
+			e.printStackTrace();
+			return Result.error(Result.ErrorCode.INTERNAL_ERROR);
+		}
 		
 		return validatedUserOrError( DB.getOne( userId, User.class), pwd);
 	}
-
+  //NOT TESTED
 	@Override
 	public Result<User> updateUser(String userId, String pwd, User other) {
 		Log.info(() -> format("updateUser : userId = %s, pwd = %s, user: %s\n", userId, pwd, other));
 
-		if (badUpdateUserInfo(userId, pwd, other))
+		// Check for invalid input
+		if (badUpdateUserInfo(userId, pwd, other)) {
 			return error(BAD_REQUEST);
+		}
 
-		return errorOrResult( validatedUserOrError(DB.getOne( userId, User.class), pwd), user -> DB.updateOne( user.updateFrom(other)));
+		try {
+			init();
+
+			// Fetch the user
+			CosmosItemResponse<UserDAO> response = users.readItem(userId, new PartitionKey(userId), UserDAO.class);
+			UserDAO existingUserDAO = response.getItem();
+
+
+			if (existingUserDAO == null || !existingUserDAO.getPwd().equals(pwd)) {
+				return Result.error(Result.ErrorCode.CONFLICT);
+			}
+
+			// Update the User
+			existingUserDAO.updateFrom(other);
+
+			// Replace the existing user in the database with the updated version
+			CosmosItemResponse<UserDAO> updatedResponse = users.replaceItem(existingUserDAO, userId, new PartitionKey(userId), new CosmosItemRequestOptions());
+
+			// Return the updated user as the result
+			UserDAO updatedUserDAO = updatedResponse.getItem();
+			return Result.ok(updatedUserDAO);
+
+		} catch (CosmosException e) {
+			Log.info("Error updating user: " + e.getMessage());
+			e.printStackTrace();
+			return Result.error(Result.ErrorCode.INTERNAL_ERROR);
+		}
 	}
+
 
 	@Override
 	public Result<User> deleteUser(String userId, String pwd) {

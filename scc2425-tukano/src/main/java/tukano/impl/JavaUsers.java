@@ -29,9 +29,9 @@ import utils.Hash;
 public class JavaUsers implements Users {
 
 	private static Logger Log = Logger.getLogger(JavaUsers.class.getName());
-	private static final String CONNECTION_URL = Constants.eduardoConst.getDbUrl();
-	private static final String DB_KEY = Constants.eduardoConst.getDbKey();
-	private static final String DB_NAME = Constants.eduardoConst.getDbName();
+	private static final String CONNECTION_URL = Constants.tomasConst.getDbUrl();
+	private static final String DB_KEY = Constants.tomasConst.getDbKey();
+	private static final String DB_NAME = Constants.tomasConst.getDbName();
 	private static Users instance;
 
 	private CosmosClient client;
@@ -78,7 +78,7 @@ public class JavaUsers implements Users {
 			return;
 		//db = client.getDatabase(DB_NAME);
 		//users = db.getContainer("users");
-		users = client.getDatabase("scc2324").getContainer("users");
+		users = client.getDatabase("scc2425").getContainer("users");
 
 	}
 
@@ -119,54 +119,55 @@ public class JavaUsers implements Users {
 				return Result.error(Result.ErrorCode.CONFLICT);
 			}
 
-
-			return Result.ok(userDAO);
+			User user = new User(userDAO.getUserId(), userDAO.getPwd(), userDAO.getEmail(), userDAO.getDisplayName());
+			return Result.ok(user);
 		} catch (CosmosException e) {
-			Log.info("Error deleting user: " + e.getMessage());
+			Log.info("Error getting user: " + e.getMessage());
 			e.printStackTrace();
 			return Result.error(Result.ErrorCode.INTERNAL_ERROR);
 		}
-		
-		return validatedUserOrError( DB.getOne( userId, User.class), pwd);
+
 	}
   //NOT TESTED
-	@Override
-	public Result<User> updateUser(String userId, String pwd, User other) {
-		Log.info(() -> format("updateUser : userId = %s, pwd = %s, user: %s\n", userId, pwd, other));
+  @Override
+  public Result<User> updateUser(String userId, String pwd, User other) {
+	  Log.info(() -> format("updateUser : userId = %s, pwd = %s, user: %s\n", userId, pwd, other));
 
-		// Check for invalid input
-		if (badUpdateUserInfo(userId, pwd, other)) {
-			return error(BAD_REQUEST);
-		}
+	  // Check for invalid input
+	  if (badUpdateUserInfo(userId, pwd, other)) {
+		  return error(BAD_REQUEST);
+	  }
 
-		try {
-			init();
+	  try {
+		  // Initialize Cosmos client if needed
+		  init();
 
-			// Fetch the user
-			CosmosItemResponse<UserDAO> response = users.readItem(userId, new PartitionKey(userId), UserDAO.class);
-			UserDAO existingUserDAO = response.getItem();
+		  // Fetch the user from the database
+		  CosmosItemResponse<UserDAO> response = users.readItem(userId, new PartitionKey(userId), UserDAO.class);
+		  UserDAO existingUserDAO = response.getItem();
 
+		  // Validate the existing user's password
+		  if (existingUserDAO == null || !existingUserDAO.getPwd().equals(pwd)) {
+			  return Result.error(Result.ErrorCode.CONFLICT); // User doesn't exist or password mismatch
+		  }
 
-			if (existingUserDAO == null || !existingUserDAO.getPwd().equals(pwd)) {
-				return Result.error(Result.ErrorCode.CONFLICT);
-			}
+		  // Update the existing user with the new values
 
-			// Update the User
-			existingUserDAO.updateFrom(other);
+		  UserDAO newUserDAO = new UserDAO(other);
+		  // Replace the user item in Cosmos DB with the updated version
+		  CosmosItemResponse<UserDAO> updatedResponse = users.replaceItem(newUserDAO, userId, new PartitionKey(userId), new CosmosItemRequestOptions());
 
-			// Replace the existing user in the database with the updated version
-			CosmosItemResponse<UserDAO> updatedResponse = users.replaceItem(existingUserDAO, userId, new PartitionKey(userId), new CosmosItemRequestOptions());
+		  // Return the updated user (UserDAO) object as a result, but convert it to a User
 
-			// Return the updated user as the result
-			UserDAO updatedUserDAO = updatedResponse.getItem();
-			return Result.ok(updatedUserDAO);
+		  return Result.ok(other);
 
-		} catch (CosmosException e) {
-			Log.info("Error updating user: " + e.getMessage());
-			e.printStackTrace();
-			return Result.error(Result.ErrorCode.INTERNAL_ERROR);
-		}
-	}
+	  } catch (CosmosException e) {
+		  Log.severe(() -> "Error updating user: " + e.getMessage());
+		  e.printStackTrace();
+		  return Result.error(Result.ErrorCode.INTERNAL_ERROR);
+	  }
+  }
+
 
 
 	@Override

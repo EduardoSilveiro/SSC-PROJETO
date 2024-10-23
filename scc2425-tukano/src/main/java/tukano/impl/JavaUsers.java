@@ -127,7 +127,6 @@ public class JavaUsers implements Users {
 			return Result.error(Result.ErrorCode.INTERNAL_ERROR);
 		}
 		
-		return validatedUserOrError( DB.getOne( userId, User.class), pwd);
 	}
   //NOT TESTED
 	@Override

@@ -47,6 +47,8 @@ public class JavaBlobs implements Blobs {
 		this.blobs = blobs;
 	}
 
+	//A ADICIONAR TOKEN, BASICAMENTE CHAMAR O JAVASHORTS INSTANCE, IR VERIFICAR O BLOBID E RETIRAR O TIME STAMP, DEPOIS USAR A CLASS
+	//TOKEN PARA VERIFICAR SE É VALIDO, ESTE TOKEN É DADO QD CRIAMOS UM SHORT PELO METODO copyWithLikes_And_Token(long totLikes)
 	@Override
 	public Result<Void> upload(String blobId, byte[] bytes, String token) {
 		Log.info(() -> format("upload : blobId = %s, sha256 = %s, token = %s\n", blobId, Hex.of(Hash.sha256(bytes)), token));

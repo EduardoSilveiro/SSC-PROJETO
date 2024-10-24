@@ -14,39 +14,94 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import com.azure.cosmos.*;
+import com.azure.cosmos.models.CosmosItemRequestOptions;
+import com.azure.cosmos.models.PartitionKey;
 import tukano.api.Blobs;
 import tukano.api.Result;
 import tukano.api.Short;
 import tukano.api.Shorts;
+import tukano.api.ShortDAO;
 import tukano.api.User;
 import tukano.impl.data.Following;
 import tukano.impl.data.Likes;
 import tukano.impl.rest.TukanoRestServer;
 import utils.DB;
-
+import com.azure.cosmos.models.CosmosItemResponse;
+import utils.Hash;
 public class JavaShorts implements Shorts {
 
 	private static Logger Log = Logger.getLogger(JavaShorts.class.getName());
-	
+	private static final String CONNECTION_URL = Constants.tomasConst.getDbUrl();
+	private static final String DB_KEY = Constants.tomasConst.getDbKey();
+	private static final String DB_NAME = Constants.tomasConst.getDbName();
 	private static Shorts instance;
 	
 	synchronized public static Shorts getInstance() {
-		if( instance == null )
-			instance = new JavaShorts();
+		if (instance != null)
+			return instance;
+
+		CosmosClient client = new CosmosClientBuilder()
+				.endpoint(CONNECTION_URL)
+				.key(DB_KEY)
+				// .directMode()
+				.gatewayMode()
+				// replace by .directMode() for better performance
+				.consistencyLevel(ConsistencyLevel.SESSION)
+				.connectionSharingAcrossClientsEnabled(true)
+				.contentResponseOnWriteEnabled(true)
+				.buildClient();
+		instance = new JavaShorts(client);
 		return instance;
 	}
-	
-	private JavaShorts() {}
-	
-	
+	private CosmosClient client;
+	private CosmosDatabase db;
+	private CosmosContainer shorts;
+	private JavaShorts(CosmosClient client) {this.client = client;}
+
+	<T> Result<T> tryCatch( Supplier<T> supplierFunc) {
+		try {
+			init();
+			return Result.ok(supplierFunc.get());
+		} catch( CosmosException ce ) {
+			//ce.printStackTrace();
+			return Result.error(Result.ErrorCode.valueOf(String.valueOf(ce.getStatusCode())));
+		} catch( Exception x ) {
+			x.printStackTrace();
+			return Result.error( Result.ErrorCode.INTERNAL_ERROR);
+		}
+	}
+
+	private synchronized void init() {
+		if (db != null)
+			return;
+		//db = client.getDatabase(DB_NAME);
+		//users = db.getContainer("users");
+		users = client.getDatabase("scc2425").getContainer("shorts");
+
+	}
 	@Override
 	public Result<Short> createShort(String userId, String password) {
 		Log.info(() -> format("createShort : userId = %s, pwd = %s\n", userId, password));
 
 		return errorOrResult( okUser(userId, password), user -> {
-			
+			try {
+				var shortId = format("%s+%s", userId, UUID.randomUUID());
+				var blobUrl = format("%s/%s/%s", TukanoRestServer.serverURI, Blobs.NAME, shortId);
+				var shrt = new Short(shortId, userId, blobUrl);
+				init();
+				ShortDAO shortDAO  = new ShortDAO(shortId,userId, blobUrl);
+				Log.info(() -> format("ShortDAO : %s\n", shortDAO));
+
+				return errorOrValue(shorts.createItem(shortDAO).getItem() , s -> s.copyWithLikes_And_Token(0));
+
+			} catch (Exception x) {
+				Log.info("Error creating user: " + x.getMessage());
+				x.printStackTrace();
+				return Result.error(Result.ErrorCode.INTERNAL_ERROR);
+			}
 			var shortId = format("%s+%s", userId, UUID.randomUUID());
-			var blobUrl = format("%s/%s/%s", TukanoRestServer.serverURI, Blobs.NAME, shortId); 
+			var blobUrl = format("%s/%s/%s", TukanoRestServer.serverURI, Blobs.NAME, shortId);
 			var shrt = new Short(shortId, userId, blobUrl);
 
 			return errorOrValue(DB.insertOne(shrt), s -> s.copyWithLikes_And_Token(0));

@@ -52,7 +52,9 @@ public class JavaBlobs implements Blobs {
 	@Override
 	public Result<Void> upload(String blobId, byte[] bytes, String token) {
 		Log.info(() -> format("upload : blobId = %s, sha256 = %s, token = %s\n", blobId, Hex.of(Hash.sha256(bytes)), token));
-
+		if( !validBlobId( blobId, token)  ) {
+			return error(FORBIDDEN);
+		}
 		BlobClient blobClient = blobs.getBlobClient(blobId);
 		blobClient.upload(BinaryData.fromBytes(bytes));
 
@@ -62,6 +64,8 @@ public class JavaBlobs implements Blobs {
 
 	@Override
 	public Result<byte[]> download(String blobId, String token) {
+		if( !Token.isValid(token, blobId)  )
+			return error(FORBIDDEN);
 		BlobClient blob = blobs.getBlobClient(blobId);
 		BinaryData data = blob.downloadContent();
 		return  Result.ok(data.toBytes());
@@ -69,6 +73,8 @@ public class JavaBlobs implements Blobs {
 
 	@Override
 	public Result<Void> delete(String blobId, String token) {
+		if( !Token.isValid(token, blobId)  )
+			return error(FORBIDDEN);
 		BlobClient blob = blobs.getBlobClient(blobId);
 		boolean isDeleted = blob.deleteIfExists();
 		return Result.ok(null);

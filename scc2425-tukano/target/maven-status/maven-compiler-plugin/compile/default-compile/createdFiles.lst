@@ -14,6 +14,7 @@ tukano\impl\JavaBlobs.class
 tukano\api\User.class
 tukano\api\rest\RestUsers.class
 tukano\impl\JavaUsers.class
+tukano\api\FeedDAO.class
 utils\DB.class
 tukano\clients\rest\RestShortsClient$3.class
 tukano\impl\rest\TukanoRestServer.class
@@ -30,6 +31,7 @@ utils\Props.class
 tukano\impl\data\Following.class
 utils\Args.class
 utils\IP.class
+tukano\api\Feed.class
 tukano\impl\rest\RestBlobsResource.class
 tukano\clients\rest\RestShortsClient$2.class
 tukano\api\UserDAO.class
@@ -37,6 +39,7 @@ utils\Queues.class
 tukano\api\rest\RestShorts.class
 tukano\api\Result$ErrorCode.class
 tukano\clients\rest\RestUsersClient$1.class
+tukano\api\ShortDAO.class
 tukano\impl\data\Likes.class
 tukano\impl\srv\UserResource.class
 utils\TryCatch.class

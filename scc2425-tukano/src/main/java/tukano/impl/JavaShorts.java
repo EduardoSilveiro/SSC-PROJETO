@@ -9,20 +9,28 @@ import static tukano.api.Result.ok;
 import static tukano.api.Result.ErrorCode.BAD_REQUEST;
 import static tukano.api.Result.ErrorCode.FORBIDDEN;
 import static utils.DB.getOne;
-
+import java.util.function.Supplier;
 import java.util.List;
+import java.util.ArrayList ;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import com.azure.cosmos.*;
-import com.azure.cosmos.models.CosmosItemRequestOptions;
+import com.azure.cosmos.CosmosContainer;
+import com.azure.cosmos.CosmosClient;
+import com.azure.cosmos.CosmosClientBuilder;
+import com.azure.cosmos.models.CosmosQueryRequestOptions;
+import com.azure.cosmos.models.SqlQuerySpec;
 import com.azure.cosmos.models.PartitionKey;
-import tukano.api.Blobs;
-import tukano.api.Result;
+import com.azure.cosmos.util.CosmosPagedIterable;
+import tukano.api.*;
 import tukano.api.Short;
-import tukano.api.Shorts;
-import tukano.api.ShortDAO;
-import tukano.api.User;
+import utils.Constants;
+import com.azure.cosmos.*;
+
+import com.azure.cosmos.models.PartitionKey;
+import com.azure.cosmos.models.SqlQuerySpec;
+
+
 import tukano.impl.data.Following;
 import tukano.impl.data.Likes;
 import tukano.impl.rest.TukanoRestServer;
@@ -57,6 +65,8 @@ public class JavaShorts implements Shorts {
 	private CosmosClient client;
 	private CosmosDatabase db;
 	private CosmosContainer shorts;
+
+	private CosmosContainer feeds;
 	private JavaShorts(CosmosClient client) {this.client = client;}
 
 	<T> Result<T> tryCatch( Supplier<T> supplierFunc) {
@@ -77,7 +87,7 @@ public class JavaShorts implements Shorts {
 			return;
 		//db = client.getDatabase(DB_NAME);
 		//users = db.getContainer("users");
-		users = client.getDatabase("scc2425").getContainer("shorts");
+		shorts = client.getDatabase("scc2425").getContainer("shorts");
 
 	}
 	@Override
@@ -90,21 +100,17 @@ public class JavaShorts implements Shorts {
 				var blobUrl = format("%s/%s/%s", TukanoRestServer.serverURI, Blobs.NAME, shortId);
 				var shrt = new Short(shortId, userId, blobUrl);
 				init();
-				ShortDAO shortDAO  = new ShortDAO(shortId,userId, blobUrl);
+				ShortDAO shortDAO  = new ShortDAO(shrt).copyWithLikes_And_Token(0);
 				Log.info(() -> format("ShortDAO : %s\n", shortDAO));
+				Log.info(() -> format("Short  : %s\n", shrt));
 
-				return errorOrValue(shorts.createItem(shortDAO).getItem() , s -> s.copyWithLikes_And_Token(0));
-
+				return  Result.ok( shorts.createItem(shortDAO).getItem().toShort().copyWithLikes_And_Token(0) )   ;
 			} catch (Exception x) {
-				Log.info("Error creating user: " + x.getMessage());
+				Log.info("Error creating short: " + x.getMessage());
 				x.printStackTrace();
 				return Result.error(Result.ErrorCode.INTERNAL_ERROR);
 			}
-			var shortId = format("%s+%s", userId, UUID.randomUUID());
-			var blobUrl = format("%s/%s/%s", TukanoRestServer.serverURI, Blobs.NAME, shortId);
-			var shrt = new Short(shortId, userId, blobUrl);
 
-			return errorOrValue(DB.insertOne(shrt), s -> s.copyWithLikes_And_Token(0));
 		});
 	}
 
@@ -114,10 +120,23 @@ public class JavaShorts implements Shorts {
 
 		if( shortId == null )
 			return error(BAD_REQUEST);
+		try {
+			init();
 
-		var query = format("SELECT count(*) FROM Likes l WHERE l.shortId = '%s'", shortId);
-		var likes = DB.sql(query, Long.class);
-		return errorOrValue( getOne(shortId, Short.class), shrt -> shrt.copyWithLikes_And_Token( likes.get(0)));
+			CosmosItemResponse<ShortDAO> response = shorts.readItem(shortId, new PartitionKey(shortId), ShortDAO.class);
+			ShortDAO shortDAO = response.getItem();
+
+			var shrt = shortDAO.toShort();
+			Log.info(() -> format("ShortDAO : %s\n", shortDAO));
+			Log.info(() -> format("Short  : %s\n", shrt));
+
+			return Result.ok(shrt);
+		} catch (CosmosException e) {
+			Log.info("Error getting user: " + e.getMessage());
+			e.printStackTrace();
+			return Result.error(Result.ErrorCode.INTERNAL_ERROR);
+		}
+
 	}
 
 	
@@ -144,9 +163,33 @@ public class JavaShorts implements Shorts {
 	@Override
 	public Result<List<String>> getShorts(String userId) {
 		Log.info(() -> format("getShorts : userId = %s\n", userId));
+		try {
+			init();
 
-		var query = format("SELECT s.shortId FROM Short s WHERE s.ownerId = '%s'", userId);
-		return errorOrValue( okUser(userId), DB.sql( query, String.class));
+			String query = String.format("SELECT s.shortId FROM Short s WHERE s.ownerId = '%s'", userId);
+
+			// Define the SQL query specification
+			SqlQuerySpec querySpec = new SqlQuerySpec(query);
+
+
+
+			// Execute the query
+			CosmosPagedIterable<ShortDAO> queryResults = shorts.queryItems(querySpec, new CosmosQueryRequestOptions(), ShortDAO.class);
+
+			// Process results
+			List<String> shortIds = new ArrayList<>();
+			queryResults.forEach(shortItem -> shortIds.add(shortItem.getShortId()));
+
+
+
+
+			return Result.ok(shortIds);
+		} catch (CosmosException e) {
+			Log.info("Error getting user: " + e.getMessage());
+			e.printStackTrace();
+			return Result.error(Result.ErrorCode.INTERNAL_ERROR);
+		}
+
 	}
 
 	@Override

@@ -3,6 +3,8 @@ package tukano.api;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import tukano.impl.Token;
+
 @Entity
 public class ShortDAO extends Short {
     @Id
@@ -18,8 +20,8 @@ public class ShortDAO extends Short {
         super(shortId, ownerId, blobUrl, timestamp, totalLikes);
     }
 
-    public ShortDAO(String shortId, String ownerId, String blobUrl) {
-        super(shortId, ownerId, blobUrl);  // Calls the parent constructor for setting default timestamp and likes
+    public ShortDAO(Short shrt) {
+        super(shrt.getShortId(),shrt.getOwnerId(), shrt.getBlobUrl());  // Calls the parent constructor for setting default timestamp and likes
     }
     public String get_rid() {
         return _rid;
@@ -45,10 +47,6 @@ public class ShortDAO extends Short {
     }
 
 
-    public ShortDAO copyWithLikes_And_Token(long totLikes) {
-        var urlWithToken = String.format("%s?token=%s", getBlobUrl(), Token.get(getBlobUrl()));
-        return new ShortDAO(getShortId(), getOwnerId(), urlWithToken, getTimestamp(), (int) totLikes);
-    }
 
 
     public Short toShort() {
@@ -59,5 +57,10 @@ public class ShortDAO extends Short {
     public static ShortDAO fromShort(Short shortObj) {
         return new ShortDAO(shortObj.getShortId(), shortObj.getOwnerId(), shortObj.getBlobUrl(),
                 shortObj.getTimestamp(), shortObj.getTotalLikes());
+    }
+    public ShortDAO copyWithLikes_And_Token( long totLikes) {
+        var urlWithToken = String.format("%s?token=%s", blobUrl, Token.get(blobUrl));
+        System.out.println(urlWithToken);
+        return new ShortDAO( shortId, ownerId, urlWithToken, timestamp, (int)totLikes);
     }
 }

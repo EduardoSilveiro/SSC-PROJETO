@@ -16,10 +16,7 @@ import java.util.logging.Logger;
 import com.azure.cosmos.*;
 import com.azure.cosmos.models.CosmosItemRequestOptions;
 import com.azure.cosmos.models.PartitionKey;
-import tukano.api.Result;
-import tukano.api.User;
-import tukano.api.UserDAO;
-import tukano.api.Users;
+import tukano.api.*;
 import utils.Constants;
 import utils.DB;
 
@@ -37,7 +34,7 @@ public class JavaUsers implements Users {
 	private CosmosClient client;
 	private CosmosDatabase db;
 	private CosmosContainer users;
-
+	private CosmosContainer feeds;
 	public static synchronized Users getInstance() {
 		if (instance != null)
 			return instance;
@@ -92,7 +89,9 @@ public class JavaUsers implements Users {
 		try {
 			init();
 			UserDAO userDAO = new UserDAO(user);
+			FeedDAO feedDAO = new FeedDAO(user.getUserId());
 			Log.info(() -> format("UserDAO : %s\n", userDAO));
+			//tryCatch(() -> feeds.createItem(feedDAO ));
 			return tryCatch(() -> users.createItem(userDAO).getItem().toString());
 		} catch (Exception x) {
 			Log.info("Error creating user: " + x.getMessage());
@@ -128,7 +127,7 @@ public class JavaUsers implements Users {
 		}
 
 	}
-  //NOT TESTED
+
   @Override
   public Result<User> updateUser(String userId, String pwd, User other) {
 	  Log.info(() -> format("updateUser : userId = %s, pwd = %s, user: %s\n", userId, pwd, other));

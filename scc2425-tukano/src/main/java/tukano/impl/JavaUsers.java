@@ -115,7 +115,9 @@ public class JavaUsers implements Users {
 			UserDAO userDAO = response.getItem();
 
 			if (!userDAO.getPwd().equals(pwd) || userDAO==null ) {
-				return Result.error(Result.ErrorCode.CONFLICT);
+				Log.info("Error getting user122: " + Result.error(Result.ErrorCode.FORBIDDEN)) ;
+
+				return Result.error(Result.ErrorCode.FORBIDDEN ) ;
 			}
 
 			User user = new User(userDAO.getUserId(), userDAO.getPwd(), userDAO.getEmail(), userDAO.getDisplayName());
@@ -123,7 +125,7 @@ public class JavaUsers implements Users {
 		} catch (CosmosException e) {
 			Log.info("Error getting user: " + e.getMessage());
 			e.printStackTrace();
-			return Result.error(Result.ErrorCode.INTERNAL_ERROR);
+			return Result.error(Result.ErrorCode.FORBIDDEN);
 		}
 
 	}

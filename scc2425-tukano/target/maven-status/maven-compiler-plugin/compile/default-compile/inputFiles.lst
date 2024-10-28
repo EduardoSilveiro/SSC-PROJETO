@@ -14,6 +14,7 @@ C:\Users\tomas\Documents\GitHub\SSC-PROJETO\scc2425-tukano\src\main\java\tukano\
 C:\Users\tomas\Documents\GitHub\SSC-PROJETO\scc2425-tukano\src\main\java\tukano\impl\rest\utils\GenericExceptionMapper.java
 C:\Users\tomas\Documents\GitHub\SSC-PROJETO\scc2425-tukano\src\main\java\tukano\impl\rest\TukanoRestServer.java
 C:\Users\tomas\Documents\GitHub\SSC-PROJETO\scc2425-tukano\src\main\java\tukano\impl\data\Likes.java
+C:\Users\tomas\Documents\GitHub\SSC-PROJETO\scc2425-tukano\src\main\java\tukano\impl\data\LikesDAO.java
 C:\Users\tomas\Documents\GitHub\SSC-PROJETO\scc2425-tukano\src\main\java\tukano\impl\data\Following.java
 C:\Users\tomas\Documents\GitHub\SSC-PROJETO\scc2425-tukano\src\main\test\tukano\clients\rest\RestClient.java
 C:\Users\tomas\Documents\GitHub\SSC-PROJETO\scc2425-tukano\src\main\java\tukano\api\ShortDAO.java
@@ -29,6 +30,7 @@ C:\Users\tomas\Documents\GitHub\SSC-PROJETO\scc2425-tukano\src\main\java\utils\D
 C:\Users\tomas\Documents\GitHub\SSC-PROJETO\scc2425-tukano\src\main\java\tukano\impl\rest\utils\CustomLoggingFilter.java
 C:\Users\tomas\Documents\GitHub\SSC-PROJETO\scc2425-tukano\src\main\test\test\Test.java
 C:\Users\tomas\Documents\GitHub\SSC-PROJETO\scc2425-tukano\src\main\java\tukano\impl\srv\UserResource.java
+C:\Users\tomas\Documents\GitHub\SSC-PROJETO\scc2425-tukano\src\main\java\tukano\impl\data\FollowingDAO.java
 C:\Users\tomas\Documents\GitHub\SSC-PROJETO\scc2425-tukano\src\main\java\utils\Queues.java
 C:\Users\tomas\Documents\GitHub\SSC-PROJETO\scc2425-tukano\src\main\java\utils\Sleep.java
 C:\Users\tomas\Documents\GitHub\SSC-PROJETO\scc2425-tukano\src\main\java\utils\Random.java

@@ -14,7 +14,8 @@ import java.util.List;
 import java.util.ArrayList ;
 import java.util.UUID;
 import java.util.logging.Logger;
-
+import com.azure.cosmos.models.CosmosItemResponse;
+import com.azure.cosmos.models.CosmosItemRequestOptions;
 import com.azure.cosmos.CosmosContainer;
 import com.azure.cosmos.CosmosClient;
 import com.azure.cosmos.CosmosClientBuilder;
@@ -24,6 +25,7 @@ import com.azure.cosmos.models.PartitionKey;
 import com.azure.cosmos.util.CosmosPagedIterable;
 import tukano.api.*;
 import tukano.api.Short;
+import tukano.impl.data.FollowingDAO;
 import utils.Constants;
 import com.azure.cosmos.*;
 
@@ -65,29 +67,20 @@ public class JavaShorts implements Shorts {
 	private CosmosClient client;
 	private CosmosDatabase db;
 	private CosmosContainer shorts;
+	private CosmosContainer following;
 
+	private CosmosContainer likes;
 	private CosmosContainer feeds;
 	private JavaShorts(CosmosClient client) {this.client = client;}
 
-	<T> Result<T> tryCatch( Supplier<T> supplierFunc) {
-		try {
-			init();
-			return Result.ok(supplierFunc.get());
-		} catch( CosmosException ce ) {
-			//ce.printStackTrace();
-			return Result.error(Result.ErrorCode.valueOf(String.valueOf(ce.getStatusCode())));
-		} catch( Exception x ) {
-			x.printStackTrace();
-			return Result.error( Result.ErrorCode.INTERNAL_ERROR);
-		}
-	}
 
-	private synchronized void init() {
+
+	private synchronized void init(String container) {
 		if (db != null)
 			return;
 		//db = client.getDatabase(DB_NAME);
 		//users = db.getContainer("users");
-		shorts = client.getDatabase("scc2425").getContainer("shorts");
+		shorts = client.getDatabase("scc2425").getContainer(container);
 
 	}
 	@Override
@@ -99,7 +92,7 @@ public class JavaShorts implements Shorts {
 				var shortId = format("%s+%s", userId, UUID.randomUUID());
 				var blobUrl = format("%s/%s/%s", TukanoRestServer.serverURI, Blobs.NAME, shortId);
 				var shrt = new Short(shortId, userId, blobUrl);
-				init();
+				init("shorts");
 				ShortDAO shortDAO  = new ShortDAO(shrt).copyWithLikes_And_Token(0);
 				Log.info(() -> format("ShortDAO : %s\n", shortDAO));
 				Log.info(() -> format("Short  : %s\n", shrt));
@@ -121,7 +114,7 @@ public class JavaShorts implements Shorts {
 		if( shortId == null )
 			return error(BAD_REQUEST);
 		try {
-			init();
+			init("shorts");
 
 			CosmosItemResponse<ShortDAO> response = shorts.readItem(shortId, new PartitionKey(shortId), ShortDAO.class);
 			ShortDAO shortDAO = response.getItem();
@@ -164,7 +157,7 @@ public class JavaShorts implements Shorts {
 	public Result<List<String>> getShorts(String userId) {
 		Log.info(() -> format("getShorts : userId = %s\n", userId));
 		try {
-			init();
+			init("shorts");
 
 			String query = String.format("SELECT s.shortId FROM Short s WHERE s.ownerId = '%s'", userId);
 
@@ -198,9 +191,26 @@ public class JavaShorts implements Shorts {
 	
 		
 		return errorOrResult( okUser(userId1, password), user -> {
-			var f = new Following(userId1, userId2);
-			return errorOrVoid( okUser( userId2), isFollowing ? DB.insertOne( f ) : DB.deleteOne( f ));	
-		});			
+
+			try {
+				init("following");
+				Result<Void> result;
+				FollowingDAO followingDAO = new FollowingDAO(userId1, userId2);
+
+				if (isFollowing) {
+
+					return Result.ok(   CosmosItemResponse<FollowingDAO>  response = following.createItem(followingDAO));
+					;
+				} else {
+					return Result.ok(following.deleteItem(userId1, new PartitionKey(userId1), new CosmosItemRequestOptions()).getItem());
+					;
+				}
+			}catch (Exception x) {
+					Log.info("Error creating user: " + x.getMessage());
+					x.printStackTrace();
+					return Result.error(Result.ErrorCode.INTERNAL_ERROR);
+				}
+ 		});
 	}
 
 	@Override
@@ -255,7 +265,9 @@ public class JavaShorts implements Shorts {
 	
 	private Result<Void> okUser( String userId ) {
 		var res = okUser( userId, "");
-		if( res.error() == FORBIDDEN )
+		Log.info("Error getting CAFAA: " + res.toString()) ;
+
+		if( res.toString().equals("(FORBIDDEN)")  )
 			return ok();
 		else
 			return error( res.error() );

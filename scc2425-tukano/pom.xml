@@ -112,11 +112,11 @@
     <artifactId>jackson-annotations</artifactId>
     <version>2.18.0</version>
 </dependency>
-		<dependency>
+		<!--<dependency>
 			<groupId>com.fasterxml.jackson.jaxrs</groupId>
 			<artifactId>jackson-jaxrs-json-provider</artifactId>
 			<version>2.18.0</version>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
@@ -150,16 +150,31 @@
 			<artifactId>resteasy-servlet-initializer</artifactId>
 			<version>5.0.9.Final</version>
 		</dependency>
-		<dependency>
-			<groupId>org.jboss.resteasy</groupId>
-			<artifactId>resteasy-jaxrs</artifactId>
-			<version>3.15.6.Final</version>
-		</dependency>
+
+
+
 		<dependency>
 			<groupId>jakarta.servlet</groupId>
 			<artifactId>jakarta.servlet-api</artifactId>
-			<version>5.0.0</version>
+			<version>6.0.0</version>
 			<scope>provided</scope>
+		</dependency>
+
+		<!--o stor tem esse-->
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-client</artifactId>
+			<version>6.2.10.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-jackson2-provider</artifactId>
+			<version>6.2.10.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-multipart-provider</artifactId>
+			<version>6.2.10.Final</version>
 		</dependency>
 
 	</dependencies>

@@ -1,5 +1,6 @@
 utils\Sleep.class
 tukano\clients\rest\RestUsersClient.class
+tukano\api\azure\RedisCache.class
 tukano\impl\rest\RestResource$1.class
 tukano\impl\Token.class
 tukano\clients\rest\RestClient.class

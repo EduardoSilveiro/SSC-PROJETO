@@ -3,7 +3,7 @@ package utils;
 public enum Constants {
     eduardoConst("https://tukanocosmos72287.documents.azure.com:443/",
             "6ulvzuHDBQgk09jceF0n5jtApjYKwJWY07RHYtJOelaZvdDj2niTMewPaG9Q4qe66Re0RTEe64yJACDbaKwEIg==", "scc2324",
-            null, null),
+            "sc2425cache72287.redis.cache.windows.net", "TAqze2ez3suwoBAdKd3nl1Tum4NHD2KBnAzCaK7vhzM="),
     tomasConst("https://scc232460182.documents.azure.com:443/",
             "S7xFx9UhYoBVAQ4wTEBz9W7KtRGGDiSdcrckwFKlGql3LfUHZ3CPBtrzvy3924hQbRopSU0DcV9gACDbL2FjNw==", "scc2324", null,
             null),
@@ -41,7 +41,7 @@ public enum Constants {
         return redisHostname;
     }
 
-    public String getredisKey() {
+    public String getRedisKey() {
         return redisKey;
     }
 }

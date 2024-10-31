@@ -5,15 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3c442bf9-271c-4bdd-b717-b59d56f8b66c" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/tests/test-user.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/tests/first_post.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/first_post.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/tukano-1.war" beforeDir="false" afterPath="$PROJECT_DIR$/target/tukano-1.war" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/tukano-1/WEB-INF/lib/jboss-jaxrs-api_2.1_spec-2.0.2.Final.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/tukano-1/WEB-INF/lib/resteasy-core-5.0.9.Final.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/tukano-1/WEB-INF/lib/resteasy-servlet-initializer-5.0.9.Final.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/tukano-1/WEB-INF/lib/slf4j-api-2.0.16.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/tukano-1/WEB-INF/lib/slf4j-simple-2.0.16.jar" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

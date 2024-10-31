@@ -7,7 +7,6 @@
 	<packaging>war</packaging>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<authors>kcg295-kcg295</authors>
 	</properties>
 	<build>
 		<sourceDirectory>src</sourceDirectory>

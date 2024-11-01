@@ -1,31 +1,37 @@
 package tukano.impl.data;
 
 import java.util.Objects;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
+
 @Entity
 public class Following{
+	@Id
+	private String id;
 
-	@Id 
 	String follower;
 	
-	@Id 
+
 	String followee;
 
 	Following() {}
 
 	public Following(String follower, String followee) {
 		super();
+		this.id = follower;
 		this.follower = follower;
 		this.followee = followee;
 	}
-
+	public String getId() {
+		return id;
+	}
 	public String getFollower() {
 		return follower;
 	}
-
+	public void setId(String id) {
+		this.id = id;
+	}
 	public void setFollower(String follower) {
 		this.follower = follower;
 	}

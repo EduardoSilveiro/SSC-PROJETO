@@ -15,19 +15,27 @@ import tukano.impl.Token;
  */
 @Entity
 public class Short {
-	
 	@Id
+	private String id;
+
 	String shortId;
 	String ownerId;
 	String blobUrl;
 	long timestamp;
 	int totalLikes;
+	public String getId() {
+		return id;
+	}
 
+	public void setId(String id) {
+		this.id = id;
+	}
 	public Short() {}
 	
 	public Short(String shortId, String ownerId, String blobUrl, long timestamp, int totalLikes) {
 		super();
-		this.shortId = shortId;
+		this.id = shortId;
+		this.shortId = shortId ;
 		this.ownerId = ownerId;
 		this.blobUrl = blobUrl;
 		this.timestamp = timestamp;
@@ -86,6 +94,7 @@ public class Short {
 	
 	public Short copyWithLikes_And_Token( long totLikes) {
 		var urlWithToken = String.format("%s?token=%s", blobUrl, Token.get(blobUrl));
+
 		return new Short( shortId, ownerId, urlWithToken, timestamp, (int)totLikes);
 	}	
 }

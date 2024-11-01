@@ -5,23 +5,130 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3c442bf9-271c-4bdd-b717-b59d56f8b66c" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/tukano/api/azure/RedisCache.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/tests/test-shorts.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/tukano/api/azure/RedisCache.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/tukano-1/WEB-INF/classes/tukano/api/azure/RedisCache.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/tukano-1/WEB-INF/lib/commons-pool2-2.11.1.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/tukano-1/WEB-INF/lib/gson-2.10.1.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/tukano-1/WEB-INF/lib/jedis-5.0.1.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/tukano-1/WEB-INF/lib/json-20230618.jar" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab3/scc2425-lab3-code/__MACOSX/scc2425-lab3/._.DS_Store" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab3/scc2425-lab3-code/__MACOSX/scc2425-lab3/._pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab3/scc2425-lab3-code/__MACOSX/scc2425-lab3/._src" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab3/scc2425-lab3-code/__MACOSX/scc2425-lab3/src/._scc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab3/scc2425-lab3-code/__MACOSX/scc2425-lab3/src/scc/._data" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab3/scc2425-lab3-code/__MACOSX/scc2425-lab3/src/scc/._db" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab3/scc2425-lab3-code/__MACOSX/scc2425-lab3/src/scc/._utils" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab3/scc2425-lab3-code/__MACOSX/scc2425-lab3/src/scc/data/._User.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab3/scc2425-lab3-code/__MACOSX/scc2425-lab3/src/scc/data/._UserDAO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab3/scc2425-lab3-code/__MACOSX/scc2425-lab3/src/scc/db/._CosmosDBLayer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab3/scc2425-lab3-code/__MACOSX/scc2425-lab3/src/scc/utils/._TestUsers.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab3/scc2425-lab3-code/scc2425-lab3/.classpath" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab3/scc2425-lab3-code/scc2425-lab3/.project" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab3/scc2425-lab3-code/scc2425-lab3/.settings/org.eclipse.jdt.core.prefs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab3/scc2425-lab3-code/scc2425-lab3/.settings/org.eclipse.m2e.core.prefs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab3/scc2425-lab3-code/scc2425-lab3/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab3/scc2425-lab3-code/scc2425-lab3/src/scc/data/User.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab3/scc2425-lab3-code/scc2425-lab3/src/scc/data/UserDAO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab3/scc2425-lab3-code/scc2425-lab3/src/scc/db/CosmosDBLayer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab3/scc2425-lab3-code/scc2425-lab3/src/scc/db/Result.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab3/scc2425-lab3-code/scc2425-lab3/src/scc/utils/TestUsers.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab4/scc2425-lab4-code/__MACOSX/scc-2425-lab4/._.DS_Store" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab4/scc2425-lab4-code/__MACOSX/scc-2425-lab4/._pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab4/scc2425-lab4-code/__MACOSX/scc-2425-lab4/._src" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab4/scc2425-lab4-code/__MACOSX/scc-2425-lab4/src/._scc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab4/scc2425-lab4-code/__MACOSX/scc-2425-lab4/src/scc/._cache" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab4/scc2425-lab4-code/__MACOSX/scc-2425-lab4/src/scc/._data" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab4/scc2425-lab4-code/__MACOSX/scc-2425-lab4/src/scc/._utils" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab4/scc2425-lab4-code/__MACOSX/scc-2425-lab4/src/scc/cache/._RedisCache.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab4/scc2425-lab4-code/__MACOSX/scc-2425-lab4/src/scc/utils/._TestCache.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab4/scc2425-lab4-code/scc-2425-lab4/.classpath" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab4/scc2425-lab4-code/scc-2425-lab4/.project" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab4/scc2425-lab4-code/scc-2425-lab4/.settings/org.eclipse.jdt.core.prefs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab4/scc2425-lab4-code/scc-2425-lab4/.settings/org.eclipse.m2e.core.prefs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab4/scc2425-lab4-code/scc-2425-lab4/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab4/scc2425-lab4-code/scc-2425-lab4/src/scc/cache/RedisCache.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab4/scc2425-lab4-code/scc-2425-lab4/src/scc/data/User.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab4/scc2425-lab4-code/scc-2425-lab4/src/scc/data/UserDAO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab4/scc2425-lab4-code/scc-2425-lab4/src/scc/utils/JSON.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../docs/labs/lab4/scc2425-lab4-code/scc-2425-lab4/src/scc/utils/TestCache.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/tukano/api/Feed.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/tukano/api/FeedDAO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/tukano/api/ShortDAO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/tukano/impl/data/FollowingDAO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/tukano/impl/data/LikesDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/SSC-PROJETO.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/SSC-PROJETO.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.project" beforeDir="false" afterPath="$PROJECT_DIR$/.project" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tukano/api/Short.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tukano/api/Short.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tukano/api/UserDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tukano/api/UserDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tukano/impl/JavaBlobs.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tukano/impl/JavaBlobs.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tukano/impl/JavaShorts.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tukano/impl/JavaShorts.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tukano/impl/JavaUsers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tukano/impl/JavaUsers.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tukano/impl/data/Following.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tukano/impl/data/Following.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tukano/impl/data/Likes.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tukano/impl/data/Likes.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/utils/Constants.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/utils/Constants.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/utils/Props.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/utils/Props.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/test/test/Test.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/test/test/Test.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/test-shorts.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/test-shorts.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/tests/test-user.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/test-user.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/tukano/api/Blobs.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/tukano/api/ErrorResult.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/api/ErrorResult.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/tukano/api/OkResult.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/api/OkResult.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/tukano/api/Result$ErrorCode.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/api/Result$ErrorCode.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/tukano/api/Short.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/api/Short.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/tukano/api/Shorts.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/tukano/api/User.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/api/User.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/tukano/api/UserDAO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/api/UserDAO.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/tukano/api/rest/RestBlobs.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/tukano/api/rest/RestShorts.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/tukano/api/rest/RestUsers.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/tukano/clients/rest/RestBlobsClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/clients/rest/RestBlobsClient.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/tukano/clients/rest/RestClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/clients/rest/RestClient.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/tukano/clients/rest/RestShortsClient$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/clients/rest/RestShortsClient$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/tukano/clients/rest/RestShortsClient$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/clients/rest/RestShortsClient$2.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/tukano/clients/rest/RestShortsClient$3.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/clients/rest/RestShortsClient$3.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/tukano/clients/rest/RestShortsClient$4.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/clients/rest/RestShortsClient$4.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/tukano/clients/rest/RestShortsClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/clients/rest/RestShortsClient.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/tukano/clients/rest/RestUsersClient$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/clients/rest/RestUsersClient$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/tukano/clients/rest/RestUsersClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/clients/rest/RestUsersClient.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/tukano/impl/JavaBlobs.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/impl/JavaBlobs.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/tukano/impl/JavaShorts.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/impl/JavaShorts.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/tukano/impl/JavaUsers.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/impl/JavaUsers.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/tukano/impl/Token.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/impl/Token.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/tukano/impl/data/Following.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/impl/data/Following.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/tukano/impl/data/Likes.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/impl/data/Likes.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/tukano/impl/rest/RestBlobsResource.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/impl/rest/RestBlobsResource.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/tukano/impl/rest/RestResource.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/impl/rest/RestResource.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/tukano/impl/rest/RestShortsResource.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/impl/rest/RestShortsResource.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/tukano/impl/rest/RestUsersResource.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/impl/rest/RestUsersResource.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/tukano/impl/rest/TukanoRestServer.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/impl/rest/TukanoRestServer.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/tukano/impl/rest/utils/CustomLoggingFilter.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/impl/rest/utils/CustomLoggingFilter.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/tukano/impl/rest/utils/GenericExceptionMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/impl/rest/utils/GenericExceptionMapper.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/tukano/impl/srv/UserResource.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/impl/srv/UserResource.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/tukano/impl/storage/BlobStorage.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/tukano/impl/storage/FilesystemStorage.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/impl/storage/FilesystemStorage.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/utils/Args.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/utils/Args.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/utils/Constants.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/utils/Constants.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/utils/DB.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/utils/DB.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/utils/Hex.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/utils/Hex.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/utils/Hibernate.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/utils/Hibernate.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/utils/IO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/utils/IO.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/utils/IP.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/utils/IP.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/utils/Props.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/utils/Props.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/utils/Queues.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/utils/Queues.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/utils/Random.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/utils/Random.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/utils/Sleep.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/utils/Sleep.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/utils/TLS.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/utils/TLS.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/utils/TryCatch$ThrowableSupplier.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/utils/TryCatch$ThrowableSupplier.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/utils/TryCatch.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/utils/TryCatch.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/tukano-1.war" beforeDir="false" afterPath="$PROJECT_DIR$/target/tukano-1.war" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/tukano-1/WEB-INF/classes/tukano/api/Short.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/tukano-1/WEB-INF/classes/tukano/api/Short.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/tukano-1/WEB-INF/classes/tukano/clients/rest/RestBlobsClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/tukano-1/WEB-INF/classes/tukano/clients/rest/RestBlobsClient.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/tukano-1/WEB-INF/classes/tukano/clients/rest/RestClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/tukano-1/WEB-INF/classes/tukano/clients/rest/RestClient.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/tukano-1/WEB-INF/classes/tukano/clients/rest/RestShortsClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/tukano-1/WEB-INF/classes/tukano/clients/rest/RestShortsClient.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/tukano-1/WEB-INF/classes/tukano/clients/rest/RestUsersClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/tukano-1/WEB-INF/classes/tukano/clients/rest/RestUsersClient.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/tukano-1/WEB-INF/classes/tukano/impl/JavaBlobs.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/tukano-1/WEB-INF/classes/tukano/impl/JavaBlobs.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/tukano-1/WEB-INF/classes/tukano/impl/JavaShorts.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/tukano-1/WEB-INF/classes/tukano/impl/JavaShorts.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/tukano-1/WEB-INF/classes/tukano/impl/JavaUsers.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/tukano-1/WEB-INF/classes/tukano/impl/JavaUsers.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/tukano-1/WEB-INF/classes/tukano/impl/data/Following.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/tukano-1/WEB-INF/classes/tukano/impl/data/Following.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/tukano-1/WEB-INF/classes/tukano/impl/data/Likes.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/tukano-1/WEB-INF/classes/tukano/impl/data/Likes.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/tukano-1/WEB-INF/classes/utils/Constants.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/tukano-1/WEB-INF/classes/utils/Constants.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

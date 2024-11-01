@@ -9,7 +9,8 @@ import static tukano.api.Result.ok;
 import static tukano.api.Result.ErrorCode.BAD_REQUEST;
 import static tukano.api.Result.ErrorCode.FORBIDDEN;
 import static utils.DB.getOne;
-
+import java.net.URI;
+import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
@@ -28,7 +29,10 @@ import tukano.impl.data.FollowingDAO;
 import tukano.impl.data.LikesDAO;
 import utils.Constants;
 import com.azure.cosmos.*;
-
+import java.io.File;
+import java.net.URI;
+import java.nio.ByteBuffer;
+import java.util.Random;
 import com.azure.cosmos.models.PartitionKey;
 import com.azure.cosmos.models.SqlQuerySpec;
 
@@ -103,12 +107,20 @@ public class JavaShorts implements Shorts {
 				var shortId = format("%s+%s", userId, UUID.randomUUID());
 				var blobUrl = format("%s/%s/%s", TukanoRestServer.serverURI, Blobs.NAME, shortId);
 				var shrt = new Short(shortId, userId, blobUrl);
+
 				initShorts() ;
 				ShortDAO shortDAO  = new ShortDAO(shrt).copyWithLikes_And_Token(0);
 				Log.info(() -> format("ShortDAO : %s\n", shortDAO));
 				Log.info(() -> format("Short  : %s\n", shrt));
 
-				return  Result.ok( shorts.createItem(shortDAO).getItem().toShort().copyWithLikes_And_Token(0) )   ;
+				 shorts.createItem(shortDAO).getItem().toShort() ;
+
+				Short s = shortDAO.toShort();
+
+				var blobUrl1 = URI.create(s.getBlobUrl());
+				var token = blobUrl1.getQuery().split("=")[1];
+				JavaBlobs.getInstance().upload(blobUrl ,randomBytes( 100 ),token );
+				return  Result.ok( s  )   ;
 			} catch (Exception x) {
 				Log.info("Error creating short: " + x.getMessage());
 				x.printStackTrace();
@@ -405,5 +417,14 @@ public class JavaShorts implements Shorts {
 			
 		});
 	}
-	
+	private static byte[] randomBytes(int size) {
+		var r = new Random(1L);
+
+		var bb = ByteBuffer.allocate(size);
+
+		r.ints(size).forEach( i -> bb.put( (byte)(i & 0xFF)));
+
+		return bb.array();
+
+	}
 }

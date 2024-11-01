@@ -9,10 +9,9 @@ import static tukano.api.Result.ok;
 import static tukano.api.Result.ErrorCode.BAD_REQUEST;
 import static tukano.api.Result.ErrorCode.FORBIDDEN;
 import static utils.DB.getOne;
+
+import java.util.*;
 import java.util.function.Supplier;
-import java.util.List;
-import java.util.ArrayList ;
-import java.util.UUID;
 import java.util.logging.Logger;
 import com.azure.cosmos.models.CosmosItemResponse;
 import com.azure.cosmos.models.CosmosItemRequestOptions;
@@ -26,12 +25,15 @@ import com.azure.cosmos.util.CosmosPagedIterable;
 import tukano.api.*;
 import tukano.api.Short;
 import tukano.impl.data.FollowingDAO;
+import tukano.impl.data.LikesDAO;
 import utils.Constants;
 import com.azure.cosmos.*;
 
 import com.azure.cosmos.models.PartitionKey;
 import com.azure.cosmos.models.SqlQuerySpec;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import tukano.impl.data.Following;
 import tukano.impl.data.Likes;
@@ -75,13 +77,22 @@ public class JavaShorts implements Shorts {
 
 
 
-	private synchronized void init(String container) {
-		if (db != null)
-			return;
-		//db = client.getDatabase(DB_NAME);
-		//users = db.getContainer("users");
-		shorts = client.getDatabase("scc2425").getContainer(container);
+	private synchronized void initShorts() {
+		if (shorts == null) {
+			shorts = client.getDatabase("scc2425").getContainer("shorts");
+		}
+	}
 
+	private synchronized void initFollowing() {
+		if (following == null) {
+			following = client.getDatabase("scc2425").getContainer("following");
+		}
+	}
+
+	private synchronized void initLikes() {
+		if (likes == null) {
+			likes = client.getDatabase("scc2425").getContainer("likes");
+		}
 	}
 	@Override
 	public Result<Short> createShort(String userId, String password) {
@@ -92,7 +103,7 @@ public class JavaShorts implements Shorts {
 				var shortId = format("%s+%s", userId, UUID.randomUUID());
 				var blobUrl = format("%s/%s/%s", TukanoRestServer.serverURI, Blobs.NAME, shortId);
 				var shrt = new Short(shortId, userId, blobUrl);
-				init("shorts");
+				initShorts() ;
 				ShortDAO shortDAO  = new ShortDAO(shrt).copyWithLikes_And_Token(0);
 				Log.info(() -> format("ShortDAO : %s\n", shortDAO));
 				Log.info(() -> format("Short  : %s\n", shrt));
@@ -114,7 +125,7 @@ public class JavaShorts implements Shorts {
 		if( shortId == null )
 			return error(BAD_REQUEST);
 		try {
-			init("shorts");
+			initShorts() ;
 
 			CosmosItemResponse<ShortDAO> response = shorts.readItem(shortId, new PartitionKey(shortId), ShortDAO.class);
 			ShortDAO shortDAO = response.getItem();
@@ -125,60 +136,72 @@ public class JavaShorts implements Shorts {
 
 			return Result.ok(shrt);
 		} catch (CosmosException e) {
-			Log.info("Error getting user: " + e.getMessage());
+			Log.info("Error getting short: " + e.getMessage());
 			e.printStackTrace();
 			return Result.error(Result.ErrorCode.INTERNAL_ERROR);
 		}
 
 	}
 
-	
+
 	@Override
 	public Result<Void> deleteShort(String shortId, String password) {
 		Log.info(() -> format("deleteShort : shortId = %s, pwd = %s\n", shortId, password));
-		
-		return errorOrResult( getShort(shortId), shrt -> {
-			
-			return errorOrResult( okUser( shrt.getOwnerId(), password), user -> {
-				return DB.transaction( hibernate -> {
 
-					hibernate.remove( shrt);
-					
-					var query = format("DELETE Likes l WHERE l.shortId = '%s'", shortId);
-					hibernate.createNativeQuery( query, Likes.class).executeUpdate();
-					
-					JavaBlobs.getInstance().delete(shrt.getBlobUrl(), Token.get() );
-				});
-			});	
+ 		return errorOrResult(getShort(shortId), shrt -> {
+			return errorOrResult(okUser(shrt.getOwnerId(), password), user -> {
+				initShorts();
+				initLikes();
+
+				// Execute a transaction-like operation
+				try {
+					// Delete the short
+					shorts.deleteItem(shortId, new PartitionKey(shortId),  new CosmosItemRequestOptions()).getItem() ; // Use appropriate partition key
+					// following.deleteItem(userId1, new PartitionKey(userId1), new CosmosItemRequestOptions()).getItem();
+
+					// Delete likes associated with the shortId
+					String query = String.format("SELECT * FROM c WHERE c.shortId = '%s'", shortId);
+					CosmosPagedIterable<LikesDAO> allLikes = likes.queryItems(query, new CosmosQueryRequestOptions(), LikesDAO.class);
+
+					// Remove each like associated with the shortId
+					for (LikesDAO like : allLikes) {
+						likes.deleteItem(like.getId(), new PartitionKey(like.getOwnerId()) ,new CosmosItemRequestOptions()).getItem() ;
+					}
+
+					// Delete the blob associated with the short
+					JavaBlobs.getInstance().delete(shrt.getBlobUrl(), Token.get());
+
+					return ok(null);
+				} catch (CosmosException e) {
+					Log.info("Error deleting short: " + e.getMessage());
+					e.printStackTrace();
+					return Result.error(Result.ErrorCode.INTERNAL_ERROR);
+				}
+			});
 		});
 	}
+
 
 	@Override
 	public Result<List<String>> getShorts(String userId) {
 		Log.info(() -> format("getShorts : userId = %s\n", userId));
 		try {
-			init("shorts");
+			initShorts() ;
 
 			String query = String.format("SELECT s.shortId FROM Short s WHERE s.ownerId = '%s'", userId);
 
-			// Define the SQL query specification
+
 			SqlQuerySpec querySpec = new SqlQuerySpec(query);
 
-
-
-			// Execute the query
 			CosmosPagedIterable<ShortDAO> queryResults = shorts.queryItems(querySpec, new CosmosQueryRequestOptions(), ShortDAO.class);
 
-			// Process results
+
 			List<String> shortIds = new ArrayList<>();
 			queryResults.forEach(shortItem -> shortIds.add(shortItem.getShortId()));
 
-
-
-
 			return Result.ok(shortIds);
 		} catch (CosmosException e) {
-			Log.info("Error getting user: " + e.getMessage());
+			Log.info("Error getting shorts: " + e.getMessage());
 			e.printStackTrace();
 			return Result.error(Result.ErrorCode.INTERNAL_ERROR);
 		}
@@ -193,70 +216,156 @@ public class JavaShorts implements Shorts {
 		return errorOrResult( okUser(userId1, password), user -> {
 
 			try {
-				init("following");
-				Result<Void> result;
+				initFollowing();
+				Result<Void> result = null;
 				FollowingDAO followingDAO = new FollowingDAO(userId1, userId2);
 
 				if (isFollowing) {
 
-					return Result.ok(   CosmosItemResponse<FollowingDAO>  response = following.createItem(followingDAO));
-					;
+					CosmosItemResponse<FollowingDAO>  response = following.createItem(followingDAO) ;
+
+					FollowingDAO followingDAO1 = response.getItem();
+					Log.info(followingDAO1.toString());
+					return Result.ok( );
+
 				} else {
-					return Result.ok(following.deleteItem(userId1, new PartitionKey(userId1), new CosmosItemRequestOptions()).getItem());
-					;
+					following.deleteItem(userId1, new PartitionKey(userId1), new CosmosItemRequestOptions()).getItem();
+					return Result.ok( );
+
 				}
-			}catch (Exception x) {
-					Log.info("Error creating user: " + x.getMessage());
-					x.printStackTrace();
-					return Result.error(Result.ErrorCode.INTERNAL_ERROR);
+			} catch (CosmosException e) {
+				Log.info("Error following: " + e.getMessage());
+				e.printStackTrace();
+				return Result.error(Result.ErrorCode.INTERNAL_ERROR);
 				}
  		});
 	}
+
 
 	@Override
 	public Result<List<String>> followers(String userId, String password) {
 		Log.info(() -> format("followers : userId = %s, pwd = %s\n", userId, password));
 
-		var query = format("SELECT f.follower FROM Following f WHERE f.followee = '%s'", userId);		
-		return errorOrValue( okUser(userId, password), DB.sql(query, String.class));
+
+		return errorOrResult(
+				okUser(userId, password),
+				user -> {
+					try {
+
+						initFollowing();
+
+
+						String query = String.format("SELECT f.follower FROM Following f WHERE f.followee = '%s'", userId);
+						SqlQuerySpec querySpec = new SqlQuerySpec(query);
+
+
+						CosmosPagedIterable<FollowingDAO> queryResults = following.queryItems(querySpec, new CosmosQueryRequestOptions(), FollowingDAO.class);
+
+
+						List<String> followers = new ArrayList<>();
+						queryResults.forEach(item -> followers.add(item.getFollower()));
+
+						return Result.ok(followers);
+					} catch (CosmosException e) {
+						Log.info("Error getting followers: " + e.getMessage());
+						e.printStackTrace();
+						return Result.error(Result.ErrorCode.INTERNAL_ERROR);
+					}
+				}
+		);
 	}
+
 
 	@Override
 	public Result<Void> like(String shortId, String userId, boolean isLiked, String password) {
 		Log.info(() -> format("like : shortId = %s, userId = %s, isLiked = %s, pwd = %s\n", shortId, userId, isLiked, password));
 
-		
-		return errorOrResult( getShort(shortId), shrt -> {
-			var l = new Likes(userId, shortId, shrt.getOwnerId());
-			return errorOrVoid( okUser( userId, password), isLiked ? DB.insertOne( l ) : DB.deleteOne( l ));	
+		return errorOrResult(getShort(shortId), shrt -> {
+
+			return errorOrResult(okUser(userId, password), user -> {
+				try {
+					initLikes();
+					LikesDAO like = new LikesDAO(userId, shortId, shrt.getOwnerId());
+					if (isLiked) {
+
+						CosmosItemResponse<LikesDAO> response = likes.createItem(like);
+						Log.info(() -> format("Liked item created: %s", response.getItem()));
+					} else {
+
+						likes.deleteItem(like.getId(), new PartitionKey(like.getId()), new CosmosItemRequestOptions());
+						Log.info(() -> format("Like item deleted for: %s", like.getId()));
+					}
+					return Result.ok();
+				} catch (CosmosException e) {
+					Log.info("Error liking: " + e.getMessage());
+					e.printStackTrace();
+					return Result.error(Result.ErrorCode.INTERNAL_ERROR);
+				}
+			});
 		});
 	}
+
 
 	@Override
 	public Result<List<String>> likes(String shortId, String password) {
 		Log.info(() -> format("likes : shortId = %s, pwd = %s\n", shortId, password));
 
-		return errorOrResult( getShort(shortId), shrt -> {
-			
-			var query = format("SELECT l.userId FROM Likes l WHERE l.shortId = '%s'", shortId);					
-			
-			return errorOrValue( okUser( shrt.getOwnerId(), password ), DB.sql(query, String.class));
+		return errorOrResult(getShort(shortId), shrt -> {
+			return errorOrResult(okUser(shrt.getOwnerId(), password), user -> {
+				try {
+					initLikes(); // Ensure we are using the "likes" container
+
+					// Define the SQL query to get users who liked the short
+					String query = String.format("SELECT l.userId FROM Likes l WHERE l.shortId = '%s'", shortId);
+					SqlQuerySpec querySpec = new SqlQuerySpec(query);
+
+					// Execute the query against the Cosmos DB
+					CosmosPagedIterable<LikesDAO> queryResults = likes.queryItems(querySpec, new CosmosQueryRequestOptions(), LikesDAO.class);
+
+					// Collect user IDs who liked the short
+					List<String> userIds = new ArrayList<>();
+					queryResults.forEach(like -> userIds.add(like.getUserId()));
+
+					return Result.ok(userIds);
+				} catch (CosmosException e) {
+					Log.info("Error getting likes: " + e.getMessage());
+					e.printStackTrace();
+					return Result.error(Result.ErrorCode.INTERNAL_ERROR);
+				}
+			});
 		});
 	}
+
 
 	@Override
 	public Result<List<String>> getFeed(String userId, String password) {
 		Log.info(() -> format("getFeed : userId = %s, pwd = %s\n", userId, password));
 
-		final var QUERY_FMT = """
-				SELECT s.shortId, s.timestamp FROM Short s WHERE	s.ownerId = '%s'				
-				UNION			
-				SELECT s.shortId, s.timestamp FROM Short s, Following f 
-					WHERE 
-						f.followee = s.ownerId AND f.follower = '%s' 
-				ORDER BY s.timestamp DESC""";
+//		final var SHORT_QUERY = format("SELECT s.shortId, s.timestamp FROM Short s WHERE	s.ownerId = '%s'" , userId);
 
-		return errorOrValue( okUser( userId, password), DB.sql( format(QUERY_FMT, userId, userId), String.class));		
+// 		List<Map> query1 = cosmos.query(Map.class , SHORT_QUERY, shorts).value();
+
+////		List<Tuple<String, Long >> res1 = query1.stream()
+//				.map(result -> new Tuple<>((String) result.get("shortId"), (Long) result.get("timestamp")))
+//				.collect(Collectors.toList());
+
+//		final var FOLLOW_QUERY = format("SELECT f.followee Following f WHERE f.follower = '%s'", userId);
+//		List<Map> query2 = cosmos.query(Map.class , FOLLOW_QUERY, following).value();
+////		List<String> followees = query2.stream().map(result -> result.get("followee").toString()).toList() ;
+
+//		List<Tuple<String, Long >> resultTuples =new ArrayList<>() ;
+
+//		for(String f : followees)  {}
+
+//		res1.addAll(resultTuples);
+
+		//	res1.sort((t1,t2) -> Long.compare(t2.getT2(), t1.getT2()));
+
+//		List<String> result =new ArrayList<>();
+//		for (Tuple<String, Long> s : res1) {
+//			result.add(s.getT1());
+//		}
+ return Result.ok( )	;
 	}
 		
 	protected Result<User> okUser( String userId, String pwd) {

@@ -62,11 +62,11 @@ public class Test {
 //
  		Result<tukano.api.Short> s1, s2;
 //
-		//show(s2 = shorts.createShort("liskov", "54321"));
-		//show(s1 = shorts.createShort("wales", "12345"));
- //show(shorts.createShort("wales", "12345"));
- //show(shorts.createShort("wales", "12345"));
-		//show(shorts.createShort("wales", "12345"));
+ show(s2 = shorts.createShort("liskov", "54321"));
+ show(s1 = shorts.createShort("wales", "12345"));
+  show(shorts.createShort("wales", "12345"));
+  show(shorts.createShort("wales", "12345"));
+		 show(shorts.createShort("wales", "12345"));
 //
 		//		var blobUrl = URI.create(s2.value().getBlobUrl());
 		//	System.out.println( "------->" + blobUrl );
@@ -83,14 +83,14 @@ public class Test {
 		//System.out.println( Hex.of(Hash.sha256( r.value() )) + "-->DOWNLOADED HERE" + Hex.of(Hash.sha256( r.value() )));
 //		var d = blobs.delete("http://Tomas:8080/rest/blobs/liskov+ab1a4521-91d2-42a5-ab67-ac7fd021a5ed?token=1729178892270-837017D4C2679C7760DEE522915D058C".toString(), null);
 //
-//		var s2id = s2.value().getShortId();
+ 		var s2id = s2.value().getShortId();
 //
- 	show(shorts.follow("liskov", "wales", true, "54321"));
+// 	show(shorts.follow("liskov", "wales", true, "54321"));
 // 	show(shorts.followers("wales", "12345"));
 //
-//		show(shorts.like(s2id, "liskov", true, "54321"));
-//		show(shorts.like(s2id, "liskov", true, "54321"));
-//		show(shorts.likes(s2id , "54321"));
+ 		show(shorts.like(s2id, "liskov", true, "54321"));
+ 		show(shorts.like(s2id, "liskov", true, "54321"));
+ 		show(shorts.likes(s2id , "54321"));
 //		show(shorts.getFeed("liskov", "12345"));
  //		show(shorts.getShort( "liskov+898759d6-f0bb-4442-8493-4c3907c05b05" ));
 //

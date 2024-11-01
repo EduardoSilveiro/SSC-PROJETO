@@ -7,19 +7,24 @@ import static tukano.api.Result.errorOrValue;
 import static tukano.api.Result.ok;
 import static tukano.api.Result.ErrorCode.BAD_REQUEST;
 import static tukano.api.Result.ErrorCode.FORBIDDEN;
-
+import com.azure.cosmos.CosmosClientBuilder;
+import com.azure.cosmos.models.CosmosQueryRequestOptions;
+import com.azure.cosmos.models.SqlQuerySpec;
+import com.azure.cosmos.models.PartitionKey;
+import com.azure.cosmos.util.CosmosPagedIterable;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
-
+import com.azure.cosmos.models.PartitionKey;
+import com.azure.cosmos.models.SqlQuerySpec;
 import com.azure.cosmos.*;
 import com.azure.cosmos.models.CosmosItemRequestOptions;
 import com.azure.cosmos.models.PartitionKey;
 import tukano.api.*;
 import utils.Constants;
 import utils.DB;
-
+import java.util.stream.Collectors;
 import com.azure.cosmos.models.CosmosItemResponse;
 import utils.Hash;
 
@@ -129,7 +134,10 @@ public class JavaUsers implements Users {
 		}
 
 	}
-
+	// Method to convert UserDAO to User
+	private User convertToUser(UserDAO userDAO) {
+		return new User(userDAO.getUserId(), userDAO.getPwd(), userDAO.getEmail(), userDAO.getDisplayName());
+	}
   @Override
   public Result<User> updateUser(String userId, String pwd, User other) {
 	  Log.info(() -> format("updateUser : userId = %s, pwd = %s, user: %s\n", userId, pwd, other));
@@ -208,15 +216,33 @@ public class JavaUsers implements Users {
 	@Override
 	public Result<List<User>> searchUsers(String pattern) {
 		Log.info( () -> format("searchUsers : patterns = %s\n", pattern));
+		try {
+			init();
 
-		var query = format("SELECT * FROM User u WHERE UPPER(u.userId) LIKE '%%%s%%'", pattern.toUpperCase());
-		var hits = DB.sql(query, User.class)
-				.stream()
-				.map(User::copyWithoutPassword)
-				.toList();
+			// Prepare the query - using string concatenation for pattern matching
+			String queryText = String.format(
+					"SELECT * FROM User u WHERE CONTAINS(UPPER(u.userId), '%s')",
+					pattern.toUpperCase().replace("'", "''") // Escape single quotes to prevent issues
+			);
 
-		return ok(hits);
+			// Execute the query
+			CosmosPagedIterable<UserDAO> results = users.queryItems(queryText, new CosmosQueryRequestOptions(), UserDAO.class);
+
+			// Process the results, converting UserDAO to User and copying without password
+			List<User> hits = results.stream()
+					.map(this::convertToUser) // Convert UserDAO to User
+					.collect(Collectors.toList());
+
+
+
+			return Result.ok(hits);
+		} catch (CosmosException e) {
+			Log.info("Error deleting user: " + e.getMessage());
+			e.printStackTrace();
+			return Result.error(Result.ErrorCode.INTERNAL_ERROR);
+		}
 	}
+
 
 	
 	private Result<User> validatedUserOrError( Result<User> res, String pwd ) {

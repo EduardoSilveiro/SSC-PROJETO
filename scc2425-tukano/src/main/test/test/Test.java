@@ -42,10 +42,10 @@ public class Test {
 		var shorts = new RestShortsClient(serverURI);
 
 
-		// users.createUser( new User("wales", "12345", "jimmy@wikipedia.pt", "Jimmy Wales")) ;
-// users.createUser( new User("liskov", "54321", "liskov@mit.edu", "Barbara Liskov")) ;
-		//show(users.createUser( new User("eduardo", "54321", "liskov@mit.edu", "Barbara Liskov") ));
-// show(users.createUser( new User("joao", "54321", "liskov@mit.edu", "Barbara Liskov") ));
+	 users.createUser( new User("wales", "12345", "jimmy@wikipedia.pt", "Jimmy Wales")) ;
+  users.createUser( new User("liskov", "54321", "liskov@mit.edu", "Barbara Liskov")) ;
+		 show(users.createUser( new User("eduardo", "54321", "liskov@mit.edu", "Barbara Liskov") ));
+  show(users.createUser( new User("joao", "54321", "liskov@mit.edu", "Barbara Liskov") ));
 // show(users.createUser( new User("jojjao", "54321", "liskov@mit.edu", "Barbara Liskov") ));
 // show(users.createUser( new User("jo2jjao", "54321", "liskov@mit.edu", "Barbara Liskov") ));
 
@@ -68,13 +68,13 @@ public class Test {
   show(shorts.createShort("wales", "12345"));
 		 show(shorts.createShort("wales", "12345"));
 //
-		//		var blobUrl = URI.create(s2.value().getBlobUrl());
+		 		var blobUrl = URI.create(s2.value().getBlobUrl());
 		//	System.out.println( "------->" + blobUrl );
 
 		//var blobId = new File( blobUrl.getPath() ).getName();
 		//System.out.println( "BlobID:" + blobId );
 //
-		//var token = blobUrl.getQuery().split("=")[1];
+		 var token = blobUrl.getQuery().split("=")[1];
 //
 		//blobs.upload(blobUrl.toString(), randomBytes( 100 ), token);
 		//	System.out.println( Hex.of(Hash.sha256( token.getBytes() )) + "-->UPLOAD HERE"   ) ;

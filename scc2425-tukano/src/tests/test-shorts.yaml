@@ -6,12 +6,8 @@ config:
       arrivalRate: 1
 
 scenarios:
-      flow:
-        - loop:
-              # Create a Short
-            - post:
-                url: /shorts/wales?pwd=12345
-                afterResponse:
-                  - capture:
-                      json: $.id
-                      as: s1id
+  - name: ShortsOperations
+    flow:
+        # Create a Short
+        - post:
+            url: /shorts/wales?pwd=12345

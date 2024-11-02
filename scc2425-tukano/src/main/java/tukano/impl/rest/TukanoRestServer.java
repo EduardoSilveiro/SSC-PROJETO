@@ -20,7 +20,7 @@ public class TukanoRestServer extends Application {
 	final private static Logger Log = Logger.getLogger(TukanoRestServer.class.getName());
 
 	static final String INETADDR_ANY = "0.0.0.0";
-	static String SERVER_BASE_URI = "http://%s:%s/rest"; //colocar /tukano/rest
+	static String SERVER_BASE_URI = "http://%s:%s/tukano/rest"; //colocar /tukano/rest
 
 	public static final int PORT = 8080;
 
@@ -38,7 +38,7 @@ public class TukanoRestServer extends Application {
 		resources.add(RestBlobsResource.class);
 		resources.add(RestUsersResource.class);
 		resources.add(RestShortsResource.class);
-		//Props.load("azurekeys-region.props"); //place the props file in resources folder under java/main
+		Props.load("azurekeys-region.props"); //place the props file in resources folder under java/main
 
 
 	}

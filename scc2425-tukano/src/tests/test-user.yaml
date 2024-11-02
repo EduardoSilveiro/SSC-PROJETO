@@ -1,7 +1,7 @@
 config:
-  target: http://127.0.0.1:8080/tukano/rest
+  target: https://tukano-1730388952740.azurewebsites.net/rest
   phases:
-    - name: simple_post
+    - name: User-Tests
       duration: 1
       arrivalRate: 1
 

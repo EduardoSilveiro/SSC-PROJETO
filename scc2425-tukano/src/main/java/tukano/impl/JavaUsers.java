@@ -40,21 +40,26 @@ public class JavaUsers implements Users {
 	private CosmosDatabase db;
 	private CosmosContainer users;
 	private CosmosContainer feeds;
+	public static String DB_MODE = Constants.eduardoConst.getDbMode();
 	public static synchronized Users getInstance() {
 		if (instance != null)
 			return instance;
-
-		CosmosClient client = new CosmosClientBuilder()
-				.endpoint(CONNECTION_URL)
-				.key(DB_KEY)
-				// .directMode()
-				.gatewayMode()
-				// replace by .directMode() for better performance
-				.consistencyLevel(ConsistencyLevel.SESSION)
-				.connectionSharingAcrossClientsEnabled(true)
-				.contentResponseOnWriteEnabled(true)
-				.buildClient();
-		instance = new JavaUsers(client);
+		if(DB_MODE.equalsIgnoreCase("post")){
+			instance = new JavaUsers();
+			return instance;
+		}else{
+			CosmosClient client = new CosmosClientBuilder()
+					.endpoint(CONNECTION_URL)
+					.key(DB_KEY)
+					// .directMode()
+					.gatewayMode()
+					// replace by .directMode() for better performance
+					.consistencyLevel(ConsistencyLevel.SESSION)
+					.connectionSharingAcrossClientsEnabled(true)
+					.contentResponseOnWriteEnabled(true)
+					.buildClient();
+			instance = new JavaUsers(client);
+		}
 		return instance;
 
 	}
@@ -62,6 +67,7 @@ public class JavaUsers implements Users {
 	public JavaUsers(CosmosClient client) {
 		this.client = client;
 	}
+	public JavaUsers(){}
 	<T> Result<T> tryCatch( Supplier<T> supplierFunc) {
 		try {
 			init();
@@ -91,17 +97,23 @@ public class JavaUsers implements Users {
 			Log.info("User data is incomplete: " + user);
 			return Result.error(Result.ErrorCode.CONFLICT);
 		}
-		try {
-			init();
-			UserDAO userDAO = new UserDAO(user);
-			FeedDAO feedDAO = new FeedDAO(user.getUserId());
-			Log.info(() -> format("UserDAO : %s\n", userDAO));
-			//tryCatch(() -> feeds.createItem(feedDAO ));
-			return tryCatch(() -> users.createItem(userDAO).getItem().toString());
-		} catch (Exception x) {
-			Log.info("Error creating user: " + x.getMessage());
-			x.printStackTrace();
-			return Result.error(Result.ErrorCode.INTERNAL_ERROR);
+
+		if(DB_MODE.equalsIgnoreCase("post")){
+			return errorOrValue( DB.insertOne( user), user.getId());
+
+		}else{
+			try {
+				init();
+				UserDAO userDAO = new UserDAO(user);
+				FeedDAO feedDAO = new FeedDAO(user.getUserId());
+				Log.info(() -> format("UserDAO : %s\n", userDAO));
+				//tryCatch(() -> feeds.createItem(feedDAO ));
+				return tryCatch(() -> users.createItem(userDAO).getItem().toString());
+			} catch (Exception x) {
+				Log.info("Error creating user: " + x.getMessage());
+				x.printStackTrace();
+				return Result.error(Result.ErrorCode.INTERNAL_ERROR);
+			}
 		}
 	}
 	//NOT TESTED

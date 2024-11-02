@@ -3,12 +3,12 @@ package utils;
 public enum Constants {
     eduardoConst("https://tukanocosmos72287.documents.azure.com:443/",
             "6ulvzuHDBQgk09jceF0n5jtApjYKwJWY07RHYtJOelaZvdDj2niTMewPaG9Q4qe66Re0RTEe64yJACDbaKwEIg==", "scc2324",
-            null, null),
+            null, null,"post"),
     tomasConst("https://scc2324204.documents.azure.com:443/",
             "RguYNsPW3CmoCZQ8vVT8uUF2d6cHycxrk7Pq3ys3ARhx77X9WYYn93vctmqKy9MRedLaJaYziLNTACDbsO7SrA==", "scc2425", null,
-            null),
+            null,"post"),
 
-    deletedUser(null, null, "DeletedUser", null, null);
+    deletedUser(null, null, "DeletedUser", null, null,null);
 
     private final String dbUrl;
     private final String dbKey;
@@ -16,13 +16,16 @@ public enum Constants {
 
     private final String redisHostname;
     private final String redisKey;
+    private final String dbMode;
 
-    Constants(String dbUrl, String dbKey, String dbName, String redisHostname, String redisKey) {
+
+    Constants(String dbUrl, String dbKey, String dbName, String redisHostname, String redisKey, String dbMode) {
         this.dbUrl = dbUrl;
         this.dbKey = dbKey;
         this.dbName = dbName;
         this.redisHostname = redisHostname;
         this.redisKey = redisKey;
+        this.dbMode = dbMode;
     }
 
     public String getDbUrl() {
@@ -44,4 +47,9 @@ public enum Constants {
     public String getRedisKey() {
         return redisKey;
     }
+    public String getDbMode() {
+        return dbMode;
+    }
+
+
 }

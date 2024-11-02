@@ -2,8 +2,10 @@ package tukano.api;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name = "AppUser")
 public class User {
 	@Id
 	private String id; // Identificador único do item
@@ -26,7 +28,7 @@ public class User {
 
 	}
 	public User(String userId, String pwd, String email, String displayName) {
-		this.id = userId; // Usando userId como id
+		this.id = userId;
 		this.pwd = pwd;
 		this.email = email;
 		this.userId = userId;

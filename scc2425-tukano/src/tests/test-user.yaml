@@ -1,5 +1,5 @@
 config:
-  target: https://tukano-1730388952740.azurewebsites.net/rest
+  target: http://127.0.0.1:8080/tukano/rest
   phases:
     - name: User-Tests
       duration: 1

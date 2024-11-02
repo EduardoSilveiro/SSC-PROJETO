@@ -125,27 +125,29 @@ public class JavaUsers implements Users {
 			return Result.error(Result.ErrorCode.BAD_REQUEST);
 		}
 
-		try {
-			init();
+		if(DB_MODE.equalsIgnoreCase("post")){
+			return validatedUserOrError( DB.getOne( userId, User.class), pwd);
+		}else{
+			try {
+				init();
 
-			CosmosItemResponse<UserDAO> response = users.readItem(userId, new PartitionKey(userId), UserDAO.class);
-			UserDAO userDAO = response.getItem();
+				CosmosItemResponse<UserDAO> response = users.readItem(userId, new PartitionKey(userId), UserDAO.class);
+				UserDAO userDAO = response.getItem();
 
-			if (!userDAO.getPwd().equals(pwd) || userDAO==null ) {
-				Log.info("Error getting user122: " + Result.error(Result.ErrorCode.FORBIDDEN)) ;
+				if (!userDAO.getPwd().equals(pwd) || userDAO==null ) {
+					Log.info("Error getting user122: " + Result.error(Result.ErrorCode.FORBIDDEN)) ;
 
-				return Result.error(Result.ErrorCode.FORBIDDEN ) ;
+					return Result.error(Result.ErrorCode.FORBIDDEN ) ;
+				}
+
+				User user = new User(userDAO.getUserId(), userDAO.getPwd(), userDAO.getEmail(), userDAO.getDisplayName());
+				return Result.ok(user);
+			} catch (CosmosException e) {
+				Log.info("Error getting user: " + e.getMessage());
+				e.printStackTrace();
+				return Result.error(Result.ErrorCode.FORBIDDEN);
 			}
-
-			User user = new User(userDAO.getUserId(), userDAO.getPwd(), userDAO.getEmail(), userDAO.getDisplayName());
-			return Result.ok(user);
-		} catch (CosmosException e) {
-			Log.info("Error getting user: " + e.getMessage());
-			e.printStackTrace();
-			return Result.error(Result.ErrorCode.FORBIDDEN);
 		}
-		
-
 	}
 	// Method to convert UserDAO to User
 	private User convertToUser(UserDAO userDAO) {
@@ -160,6 +162,9 @@ public class JavaUsers implements Users {
 		  return error(BAD_REQUEST);
 	  }
 
+	  if(DB_MODE.equalsIgnoreCase("post")){
+		  return errorOrResult( validatedUserOrError(DB.getOne( userId, User.class), pwd), user -> DB.updateOne( user.updateFrom(other)));
+	  }
 	  try {
 		  // Initialize Cosmos client if needed
 		  init();
@@ -200,6 +205,17 @@ public class JavaUsers implements Users {
 			return Result.error(Result.ErrorCode.BAD_REQUEST);
 		}
 
+		if(DB_MODE.equalsIgnoreCase("post")){
+			return errorOrResult( validatedUserOrError(DB.getOne( userId, User.class), pwd), user -> {
+				// Delete user shorts and related info asynchronously in a separate thread
+				Executors.defaultThreadFactory().newThread( () -> {
+					JavaShorts.getInstance().deleteAllShorts(userId, pwd, Token.get(userId));
+					JavaBlobs.getInstance().deleteAllBlobs(userId, Token.get(userId));
+				}).start();
+
+				return DB.deleteOne( user);
+			});
+		}
 		try {
 			init();
 
@@ -229,6 +245,18 @@ public class JavaUsers implements Users {
 	@Override
 	public Result<List<User>> searchUsers(String pattern) {
 		Log.info( () -> format("searchUsers : patterns = %s\n", pattern));
+
+		var query = format("SELECT * FROM User u WHERE UPPER(u.userId) LIKE '%%%s%%'", pattern.toUpperCase());
+
+		var hitss = DB.sql(query, User.class)
+				.stream()
+				.map(User::copyWithoutPassword)
+				.toList();
+
+		if(DB_MODE.equalsIgnoreCase("post")){
+			return ok(hitss);
+		}
+
 		try {
 			init();
 
@@ -245,8 +273,6 @@ public class JavaUsers implements Users {
 			List<User> hits = results.stream()
 					.map(this::convertToUser) // Convert UserDAO to User
 					.collect(Collectors.toList());
-
-
 
 			return Result.ok(hits);
 		} catch (CosmosException e) {

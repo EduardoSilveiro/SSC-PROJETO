@@ -52,24 +52,31 @@ public class JavaShorts implements Shorts {
 	private static final String DB_KEY = Constants.eduardoConst.getDbKey();
 	private static final String DB_NAME = Constants.eduardoConst.getDbName();
 	private static Shorts instance;
-	
+
+	public static String DB_MODE = Constants.eduardoConst.getDbMode();
+
 	synchronized public static Shorts getInstance() {
 		if (instance != null)
 			return instance;
-
-		CosmosClient client = new CosmosClientBuilder()
-				.endpoint(CONNECTION_URL)
-				.key(DB_KEY)
-				// .directMode()
-				.gatewayMode()
-				// replace by .directMode() for better performance
-				.consistencyLevel(ConsistencyLevel.SESSION)
-				.connectionSharingAcrossClientsEnabled(true)
-				.contentResponseOnWriteEnabled(true)
-				.buildClient();
-		instance = new JavaShorts(client);
-		return instance;
+		if (DB_MODE.equalsIgnoreCase("post")) {
+			instance = new JavaShorts();
+			return instance;
+		} else {
+			CosmosClient client = new CosmosClientBuilder()
+					.endpoint(CONNECTION_URL)
+					.key(DB_KEY)
+					// .directMode()
+					.gatewayMode()
+					// replace by .directMode() for better performance
+					.consistencyLevel(ConsistencyLevel.SESSION)
+					.connectionSharingAcrossClientsEnabled(true)
+					.contentResponseOnWriteEnabled(true)
+					.buildClient();
+			instance = new JavaShorts(client);
+			return instance;
+		}
 	}
+
 	private CosmosClient client;
 	private CosmosDatabase db;
 	private CosmosContainer shorts;
@@ -79,7 +86,7 @@ public class JavaShorts implements Shorts {
 	private CosmosContainer feeds;
 	private JavaShorts(CosmosClient client) {this.client = client;}
 
-
+	public JavaShorts(){}
 
 	private synchronized void initShorts() {
 		if (shorts == null) {
@@ -102,8 +109,21 @@ public class JavaShorts implements Shorts {
 	public Result<Short> createShort(String userId, String password) {
 		Log.info(() -> format("createShort : userId = %s, pwd = %s\n", userId, password));
 
+		if(DB_MODE.equalsIgnoreCase("post")){
+			return errorOrResult( okUser(userId, password), user -> {
+
+				var shortId = format("%s+%s", userId, UUID.randomUUID());
+				var blobUrl = format("%s/%s/%s", TukanoRestServer.serverURI, Blobs.NAME, shortId);
+				var shrt = new Short(shortId, userId, blobUrl);
+				var blobUrl1 = URI.create(shrt.getBlobUrl());
+				var token = blobUrl1.getQuery().split("=")[1];
+				JavaBlobs.getInstance().upload(blobUrl ,randomBytes( 100 ),token );
+				return errorOrValue(DB.insertOne(shrt), s -> s.copyWithLikes_And_Token(0));
+			});
+		}
 		return errorOrResult( okUser(userId, password), user -> {
 			try {
+
 				var shortId = format("%s+%s", userId, UUID.randomUUID());
 				var blobUrl = format("%s/%s/%s", TukanoRestServer.serverURI, Blobs.NAME, shortId);
 				var shrt = new Short(shortId, userId, blobUrl);
@@ -134,8 +154,16 @@ public class JavaShorts implements Shorts {
 	public Result<Short> getShort(String shortId) {
 		Log.info(() -> format("getShort : shortId = %s\n", shortId));
 
-		if( shortId == null )
+		if (shortId == null){
 			return error(BAD_REQUEST);
+		}
+
+		if(DB_MODE.equalsIgnoreCase("post")){
+			var query = format("SELECT count(*) FROM Likes l WHERE l.shortId = '%s'", shortId);
+			var likes = DB.sql(query, Long.class);
+			return errorOrValue( getOne(shortId, Short.class), shrt -> shrt.copyWithLikes_And_Token( likes.get(0)));
+		}
+
 		try {
 			initShorts() ;
 
@@ -159,6 +187,20 @@ public class JavaShorts implements Shorts {
 	@Override
 	public Result<Void> deleteShort(String shortId, String password) {
 		Log.info(() -> format("deleteShort : shortId = %s, pwd = %s\n", shortId, password));
+
+
+		if(DB_MODE.equalsIgnoreCase("post")){
+			return errorOrResult( getShort(shortId), shrt ->
+						errorOrResult( okUser( shrt.getOwnerId(), password), user ->
+							DB.transaction(hibernate -> {
+				hibernate.remove( shrt);
+
+				var query = format("DELETE Likes l WHERE l.shortId = '%s'", shortId);
+				hibernate.createNativeQuery( query, Likes.class).executeUpdate();
+
+				JavaBlobs.getInstance().delete(shrt.getBlobUrl(), Token.get() );
+			})));
+		}
 
  		return errorOrResult(getShort(shortId), shrt -> {
 			return errorOrResult(okUser(shrt.getOwnerId(), password), user -> {
@@ -197,6 +239,12 @@ public class JavaShorts implements Shorts {
 	@Override
 	public Result<List<String>> getShorts(String userId) {
 		Log.info(() -> format("getShorts : userId = %s\n", userId));
+
+		if(DB_MODE.equalsIgnoreCase("post")){
+			var query = format("SELECT s.shortId FROM Short s WHERE s.ownerId = '%s'", userId);
+			return errorOrValue( okUser(userId), DB.sql( query, String.class));
+		}
+
 		try {
 			initShorts() ;
 
@@ -223,8 +271,14 @@ public class JavaShorts implements Shorts {
 	@Override
 	public Result<Void> follow(String userId1, String userId2, boolean isFollowing, String password) {
 		Log.info(() -> format("follow : userId1 = %s, userId2 = %s, isFollowing = %s, pwd = %s\n", userId1, userId2, isFollowing, password));
-	
-		
+
+		if(DB_MODE.equalsIgnoreCase("post")){
+			return errorOrResult(okUser(userId1, password), user -> {
+			var f = new Following(userId1, userId2);
+			return errorOrVoid(okUser(userId2), isFollowing ? DB.insertOne(f) : DB.deleteOne(f));
+
+			});
+		}
 		return errorOrResult( okUser(userId1, password), user -> {
 
 			try {
@@ -258,7 +312,10 @@ public class JavaShorts implements Shorts {
 	public Result<List<String>> followers(String userId, String password) {
 		Log.info(() -> format("followers : userId = %s, pwd = %s\n", userId, password));
 
-
+		if(DB_MODE.equalsIgnoreCase("post")){
+			var query = format("SELECT f.follower FROM Following f WHERE f.followee = '%s'", userId);
+			return errorOrValue( okUser(userId, password), DB.sql(query, String.class));
+		}
 		return errorOrResult(
 				okUser(userId, password),
 				user -> {
@@ -292,7 +349,14 @@ public class JavaShorts implements Shorts {
 	public Result<Void> like(String shortId, String userId, boolean isLiked, String password) {
 		Log.info(() -> format("like : shortId = %s, userId = %s, isLiked = %s, pwd = %s\n", shortId, userId, isLiked, password));
 
-		return errorOrResult(getShort(shortId), shrt -> {
+		if(DB_MODE.equalsIgnoreCase("post")) {
+			return errorOrResult( getShort(shortId), shrt -> {
+				var l = new Likes(userId, shortId, shrt.getOwnerId());
+				return errorOrVoid( okUser( userId, password), isLiked ? DB.insertOne( l ) : DB.deleteOne( l ));
+			});
+
+		}
+			return errorOrResult(getShort(shortId), shrt -> {
 
 			return errorOrResult(okUser(userId, password), user -> {
 				try {
@@ -322,7 +386,16 @@ public class JavaShorts implements Shorts {
 	public Result<List<String>> likes(String shortId, String password) {
 		Log.info(() -> format("likes : shortId = %s, pwd = %s\n", shortId, password));
 
-		return errorOrResult(getShort(shortId), shrt -> {
+
+		if(DB_MODE.equalsIgnoreCase("post")) {
+			return errorOrResult( getShort(shortId), shrt -> {
+
+				var query = format("SELECT l.userId FROM Likes l WHERE l.shortId = '%s'", shortId);
+
+				return errorOrValue( okUser( shrt.getOwnerId(), password ), DB.sql(query, String.class));
+			});
+		}
+			return errorOrResult(getShort(shortId), shrt -> {
 			return errorOrResult(okUser(shrt.getOwnerId(), password), user -> {
 				try {
 					initLikes(); // Ensure we are using the "likes" container

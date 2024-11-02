@@ -1,3 +1,4 @@
+/**
 package tukano.impl.rest;
 
 import java.net.URI;
@@ -47,11 +48,11 @@ public class TukanoRestServer extends Application {
 
 	protected void start() throws Exception {
 
-	/** ResourceConfig config = new ResourceConfig();
+	 ResourceConfig config = new ResourceConfig();
 
 		JdkHttpServerFactory.createHttpServer( URI.create(serverURI.replace(IP.hostname(), INETADDR_ANY)), config);
 
-		Log.info(String.format("Tukano Server ready @ %s\n",  serverURI));**/
+		Log.info(String.format("Tukano Server ready @ %s\n",  serverURI));
 	}
 
 
@@ -75,8 +76,8 @@ public class TukanoRestServer extends Application {
 		return singletons;
 	}
 }
-
-/**package tukano.impl.rest;
+**/
+package tukano.impl.rest;
 
  import java.net.URI;
  import java.util.logging.Logger;
@@ -132,4 +133,3 @@ public class TukanoRestServer extends Application {
  new TukanoRestServer().start();
  }
  }
- **/

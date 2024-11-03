@@ -110,42 +110,71 @@ public class JavaUsers implements Users {
 			return Result.error(Result.ErrorCode.CONFLICT);
 		}
 
-		if(DB_MODE.equalsIgnoreCase("post")){
-			errorOrValue( DB.insertOne( user), user.getId());
+		if (DB_MODE.equalsIgnoreCase("post")) {
+			errorOrValue(DB.insertOne(user), user.getId());
 			if (CACHE_MODE) {
 				UserDAO userDAO = new UserDAO(user);
 				var key1 = "users:" + userDAO.getId();
-				var value1 = JSON.encode(userDAO);
-				cache.setValue(key1,value1);
+
+				cache.setValue(key1, userDAO);
 				Log.info("Cache data is completed for POSTESQL: " + user);
 			}
 			return Result.ok(user.getId());
-		}else{
+		} else {
 			try {
 				init();
-				UserDAO userDAO = new UserDAO(user);
- 				Log.info(() -> format("UserDAO : %s\n", userDAO));
-
+				var userDAO = new UserDAO(user);
+				Log.info(() -> format("UserDAO : %s\n", userDAO));
 
 
 				if (CACHE_MODE) {
-					var key1 = "users:" + userDAO.getUserId();
-					var value1 = JSON.encode(userDAO);
-					cache.setValue(key1,value1);
+					var key = "users:" + userDAO.getUserId();
+
+
+						cache.setValue(key,userDAO);
+						Log.info(() -> format("Cache data is completed for user: " + userDAO.getUserId()));
 
 				}
+				users.createItem(userDAO).getItem() ;
 
-				return  tryCatch(() -> users.createItem(userDAO).getItem().toString());
+				return Result.ok(null);
 
-			}   catch (CosmosException e) {
-				Log.info(() -> format("UserDAO4444 : %s\n" ));
-			Log.info("Error creating user: " + e.getMessage());
-			e.printStackTrace();
-			return Result.error(Result.ErrorCode.FORBIDDEN);
-		}
+			} catch (CosmosException e) {
+				Log.info(() -> format("UserDAO4444 : %s\n"));
+				Log.info("Error creating user: " + e.getMessage());
+				e.printStackTrace();
+				return Result.error(Result.ErrorCode.FORBIDDEN);
+			}
 		}
 	}
 	//NOT TESTED
+	private Result<User> getUserFromCosmos(String userId, String pwd) {
+		try {
+			init();
+
+			CosmosItemResponse<UserDAO> response = users.readItem(userId, new PartitionKey(userId), UserDAO.class);
+			UserDAO userDAO = response.getItem();
+
+			if (userDAO == null || !userDAO.getPwd().equals(pwd)) {
+				Log.info("Error getting user: " + Result.error(Result.ErrorCode.FORBIDDEN));
+				return Result.error(Result.ErrorCode.FORBIDDEN);
+			}
+				var key = "users:" + userDAO.getUserId();
+
+
+				cache.setValue(key, userDAO);
+				Log.info(() -> format("Cache data is completed from db: " + userDAO.getUserId()));
+
+
+			User user = new User(userDAO.getUserId(), userDAO.getPwd(), userDAO.getEmail(), userDAO.getDisplayName());
+			return Result.ok(user);
+
+		} catch (CosmosException e) {
+			Log.info("Error getting user from Cosmos DB: " + e.getMessage());
+			e.printStackTrace();
+			return Result.error(Result.ErrorCode.FORBIDDEN);
+		}
+	}
 	@Override
 	public Result<User> getUser(String userId, String pwd) {
 		Log.info( () -> format("getUser : userId = %s, pwd = %s\n", userId, pwd));
@@ -153,17 +182,27 @@ public class JavaUsers implements Users {
 		if (userId == null || pwd == null) {
 			return Result.error(Result.ErrorCode.BAD_REQUEST);
 		}
-
 		if (CACHE_MODE) {
-			var key1 = "users:" + userId;
-			var value = cache.getValue(key1,UserDAO.class);
-			Log.info("Cache data is completed for POSTESQL: " + value);
-			if (!value.getPwd().equals(pwd)) {
-				return Result.error(FORBIDDEN);
+			var key = "users:" + userId;
+			var value = getFromCache(userId, pwd);
+
+			try {
+				if (value != null) {
+					if (!value.get(userId).getPwd().equals(pwd)) {
+						return Result.error(FORBIDDEN);
+					}
+					cache.setValue(key, value.get(key));
+					User user = new User(value.get(key).getUserId(), value.get(key).getPwd(), value.get(key).getEmail(), value.get(key).getDisplayName());
+					Log.info(() -> format("User from cache   " + user.getUserId()));
+					return Result.ok(user);
+				}
+
+				return (getUserFromCosmos(userId, pwd));
+			} catch (Exception e) {
+				Log.info(() -> format("Failed to cache user " + userId + ": " + e.getMessage()));
 			}
-			User user = new User(value.getUserId(),value.getPwd(),value.getEmail(), value.getDisplayName());
-			return Result.ok(user);
 		}
+
 
 		if(DB_MODE.equalsIgnoreCase("post")){
 			return validatedUserOrError( DB.getOne( userId, User.class), pwd);
@@ -202,7 +241,7 @@ public class JavaUsers implements Users {
 	  if (badUpdateUserInfo(userId, pwd, other)) {
 		  return error(BAD_REQUEST);
 	  }
-	  Map<String,User> userMap = getFromCache(userId,pwd);
+	  Map<String,UserDAO> userMap = getFromCache(userId,pwd);
 
 
 	  if(DB_MODE.equalsIgnoreCase("post")){
@@ -259,18 +298,18 @@ public class JavaUsers implements Users {
   }
 
 
-  private Map<String,User> getFromCache (String userId, String pwd){
+  private Map<String,UserDAO> getFromCache (String userId, String pwd){
 	  if (CACHE_MODE) {
 		  var key1 = "users:" + userId;
 		  var value = cache.getValue(key1,UserDAO.class);
-		  Log.info("Cache data is completed for POSTESQL: " + value);
+		  Log.info("getFromCache : " + value);
 		  if (!value.getPwd().equals(pwd)) {
 			  return null;
 		  }
 
-		  User newUser = new User(value.getUserId(),value.getPwd(),value.getEmail(), value.getDisplayName());
-		  Map<String,User> userMap = new HashMap<>();
-		  userMap.put(key1,newUser);
+
+		  Map<String,UserDAO> userMap = new HashMap<>();
+		  userMap.put(key1,value);
 		  return userMap;
 
 	  }
@@ -284,7 +323,7 @@ public class JavaUsers implements Users {
 		if (userId == null || pwd == null) {
 			return Result.error(Result.ErrorCode.BAD_REQUEST);
 		}
-		Map<String,User> userMap = getFromCache(userId,pwd);
+		Map<String,UserDAO> userMap = getFromCache(userId,pwd);
 
 		if(DB_MODE.equalsIgnoreCase("post")){
 			if(userMap !=null) {

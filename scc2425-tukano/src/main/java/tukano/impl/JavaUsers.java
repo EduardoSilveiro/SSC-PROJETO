@@ -12,7 +12,10 @@ import com.azure.cosmos.models.CosmosQueryRequestOptions;
 import com.azure.cosmos.models.SqlQuerySpec;
 import com.azure.cosmos.models.PartitionKey;
 import com.azure.cosmos.util.CosmosPagedIterable;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
@@ -22,11 +25,13 @@ import com.azure.cosmos.*;
 import com.azure.cosmos.models.CosmosItemRequestOptions;
 import com.azure.cosmos.models.PartitionKey;
 import tukano.api.*;
+import tukano.api.azure.RedisCache;
 import utils.Constants;
 import utils.DB;
 import java.util.stream.Collectors;
 import com.azure.cosmos.models.CosmosItemResponse;
 import utils.Hash;
+import utils.JSON;
 
 public class JavaUsers implements Users {
 
@@ -40,8 +45,14 @@ public class JavaUsers implements Users {
 	private CosmosDatabase db;
 	private CosmosContainer users;
 	private CosmosContainer feeds;
+	static RedisCache cache = RedisCache.getInstance();
+
 	public static String DB_MODE = Constants.eduardoConst.getDbMode();
+	public static boolean CACHE_MODE = Constants.eduardoConst.isCacheActive();
+
 	public static synchronized Users getInstance() {
+
+
 		if (instance != null)
 			return instance;
 		if(DB_MODE.equalsIgnoreCase("post")){
@@ -93,27 +104,45 @@ public class JavaUsers implements Users {
 	@Override
 	public Result<String> createUser(User user) {
 		Log.info(() -> format("createUser : %s\n", user));
+
 		if (user.getUserId() == null || user.getPwd() == null || user.getEmail() == null || user.getDisplayName() == null) {
 			Log.info("User data is incomplete: " + user);
 			return Result.error(Result.ErrorCode.CONFLICT);
 		}
 
 		if(DB_MODE.equalsIgnoreCase("post")){
-			return errorOrValue( DB.insertOne( user), user.getId());
-
+			errorOrValue( DB.insertOne( user), user.getId());
+			if (CACHE_MODE) {
+				UserDAO userDAO = new UserDAO(user);
+				var key1 = "users:" + userDAO.getId();
+				var value1 = JSON.encode(userDAO);
+				cache.setValue(key1,value1);
+				Log.info("Cache data is completed for POSTESQL: " + user);
+			}
+			return Result.ok(user.getId());
 		}else{
 			try {
 				init();
 				UserDAO userDAO = new UserDAO(user);
-				FeedDAO feedDAO = new FeedDAO(user.getUserId());
-				Log.info(() -> format("UserDAO : %s\n", userDAO));
-				//tryCatch(() -> feeds.createItem(feedDAO ));
-				return tryCatch(() -> users.createItem(userDAO).getItem().toString());
-			} catch (Exception x) {
-				Log.info("Error creating user: " + x.getMessage());
-				x.printStackTrace();
-				return Result.error(Result.ErrorCode.INTERNAL_ERROR);
-			}
+ 				Log.info(() -> format("UserDAO : %s\n", userDAO));
+
+
+
+				if (CACHE_MODE) {
+					var key1 = "users:" + userDAO.getUserId();
+					var value1 = JSON.encode(userDAO);
+					cache.setValue(key1,value1);
+
+				}
+
+				return  tryCatch(() -> users.createItem(userDAO).getItem().toString());
+
+			}   catch (CosmosException e) {
+				Log.info(() -> format("UserDAO4444 : %s\n" ));
+			Log.info("Error creating user: " + e.getMessage());
+			e.printStackTrace();
+			return Result.error(Result.ErrorCode.FORBIDDEN);
+		}
 		}
 	}
 	//NOT TESTED
@@ -123,6 +152,17 @@ public class JavaUsers implements Users {
 
 		if (userId == null || pwd == null) {
 			return Result.error(Result.ErrorCode.BAD_REQUEST);
+		}
+
+		if (CACHE_MODE) {
+			var key1 = "users:" + userId;
+			var value = cache.getValue(key1,UserDAO.class);
+			Log.info("Cache data is completed for POSTESQL: " + value);
+			if (!value.getPwd().equals(pwd)) {
+				return Result.error(FORBIDDEN);
+			}
+			User user = new User(value.getUserId(),value.getPwd(),value.getEmail(), value.getDisplayName());
+			return Result.ok(user);
 		}
 
 		if(DB_MODE.equalsIgnoreCase("post")){
@@ -156,19 +196,42 @@ public class JavaUsers implements Users {
   @Override
   public Result<User> updateUser(String userId, String pwd, User other) {
 	  Log.info(() -> format("updateUser : userId = %s, pwd = %s, user: %s\n", userId, pwd, other));
+	  User user = new User();
 
 	  // Check for invalid input
 	  if (badUpdateUserInfo(userId, pwd, other)) {
 		  return error(BAD_REQUEST);
 	  }
+	  Map<String,User> userMap = getFromCache(userId,pwd);
+
 
 	  if(DB_MODE.equalsIgnoreCase("post")){
-		  return errorOrResult( validatedUserOrError(DB.getOne( userId, User.class), pwd), user -> DB.updateOne( user.updateFrom(other)));
+
+		  if (userMap != null) {
+ 			User postUser =  userMap.get("users:" + userId);
+			  cache.setValue("users:" + userId, postUser.updateFrom(other));
+			  Log.info("Cache data is completed for NO SQL: " + user);
+
+			  return Result.ok(DB.updateOne( postUser.updateFrom(other)).value() ) ;
+		  }
+		  return errorOrResult( validatedUserOrError(DB.getOne( userId, User.class), pwd), user1 ->
+				  DB.updateOne( user1.updateFrom(other)));
 	  }
 	  try {
+
 		  // Initialize Cosmos client if needed
 		  init();
+ 			if (user != null) {
 
+			  UserDAO newUserDAO = new UserDAO(other);
+
+			  CosmosItemResponse<UserDAO> updatedResponse = users.replaceItem(newUserDAO, userId, new PartitionKey(userId), new CosmosItemRequestOptions());
+			  User postUser =  userMap.get("users:" + userId);
+			  cache.setValue("users:" + userId, postUser.updateFrom(other));
+			  Log.info("Cache data is completed for NO SQL: " + user);
+			  return Result.ok(other);
+
+		  }
 		  // Fetch the user from the database
 		  CosmosItemResponse<UserDAO> response = users.readItem(userId, new PartitionKey(userId), UserDAO.class);
 		  UserDAO existingUserDAO = response.getItem();
@@ -196,6 +259,23 @@ public class JavaUsers implements Users {
   }
 
 
+  private Map<String,User> getFromCache (String userId, String pwd){
+	  if (CACHE_MODE) {
+		  var key1 = "users:" + userId;
+		  var value = cache.getValue(key1,UserDAO.class);
+		  Log.info("Cache data is completed for POSTESQL: " + value);
+		  if (!value.getPwd().equals(pwd)) {
+			  return null;
+		  }
+
+		  User newUser = new User(value.getUserId(),value.getPwd(),value.getEmail(), value.getDisplayName());
+		  Map<String,User> userMap = new HashMap<>();
+		  userMap.put(key1,newUser);
+		  return userMap;
+
+	  }
+	  return null;
+  }
 
 	@Override
 	public Result<User> deleteUser(String userId, String pwd) {
@@ -204,8 +284,23 @@ public class JavaUsers implements Users {
 		if (userId == null || pwd == null) {
 			return Result.error(Result.ErrorCode.BAD_REQUEST);
 		}
+		Map<String,User> userMap = getFromCache(userId,pwd);
 
 		if(DB_MODE.equalsIgnoreCase("post")){
+			if(userMap !=null) {
+				User postUser =  userMap.get("users:" + userId);
+				cache.delete("users:" + userId );
+				Log.info("Cache data is deleted for PostSQL: " );
+
+					// Delete user shorts and related info asynchronously in a separate thread
+					Executors.defaultThreadFactory().newThread( () -> {
+						JavaShorts.getInstance().deleteAllShorts(userId, pwd, Token.get(userId));
+						JavaBlobs.getInstance().deleteAllBlobs(userId, Token.get(userId));
+					}).start();
+
+					return DB.deleteOne( postUser)  ;
+
+			}
 			return errorOrResult( validatedUserOrError(DB.getOne( userId, User.class), pwd), user -> {
 				// Delete user shorts and related info asynchronously in a separate thread
 				Executors.defaultThreadFactory().newThread( () -> {
@@ -218,7 +313,20 @@ public class JavaUsers implements Users {
 		}
 		try {
 			init();
+			if(userMap !=null) {
+				User postUser =  userMap.get("users:" + userId);
+				cache.delete("users:" + userId );
+				Log.info("Cache data is deleted for PostSQL: " );
 
+				// Delete user shorts and related info asynchronously in a separate thread
+				Executors.defaultThreadFactory().newThread( () -> {
+					JavaShorts.getInstance().deleteAllShorts(userId, pwd, Token.get(userId));
+					JavaBlobs.getInstance().deleteAllBlobs(userId, Token.get(userId));
+				}).start();
+				UserDAO userDAO = new UserDAO(postUser);
+				return Result.ok(userDAO);
+
+			}
 			CosmosItemResponse<UserDAO> response = users.readItem(userId, new PartitionKey(userId), UserDAO.class);
 			UserDAO userDAO = response.getItem();
 

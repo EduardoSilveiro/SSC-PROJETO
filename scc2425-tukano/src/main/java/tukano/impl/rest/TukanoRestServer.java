@@ -76,6 +76,7 @@ public class TukanoRestServer extends Application {
 		return singletons;
 	}
 }
+
 **/
 package tukano.impl.rest;
 

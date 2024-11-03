@@ -6,12 +6,11 @@
   <component name="ChangeListManager">
     <list default="true" id="3c442bf9-271c-4bdd-b717-b59d56f8b66c" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tukano/impl/JavaShorts.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tukano/impl/JavaShorts.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/tukano/impl/JavaUsers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tukano/impl/JavaUsers.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/tukano/impl/rest/TukanoRestServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tukano/impl/rest/TukanoRestServer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/test/test/Test.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/test/test/Test.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/test/Test.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/test/Test.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/tukano/impl/JavaShorts.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/impl/JavaShorts.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/utils/Constants.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/utils/Constants.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tests/test-user.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/test-user.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/tukano/api/UserDAO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/api/UserDAO.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/tukano/impl/JavaUsers.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/impl/JavaUsers.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/tukano/impl/rest/TukanoRestServer.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/impl/rest/TukanoRestServer.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/utils/Constants.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/utils/Constants.class" afterDir="false" />
@@ -198,6 +197,10 @@
       <change beforePath="$PROJECT_DIR$/target/tukano-1/WEB-INF/web.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/target/tukano-1/index.html" beforeDir="false" />
     </list>
+    <list id="5e6b6627-f8e5-46a8-b838-e201a24495fc" name="Changes by tomas" comment="">
+      <change beforePath="$PROJECT_DIR$/src/main/java/tukano/api/UserDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tukano/api/UserDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tukano/impl/JavaUsers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tukano/impl/JavaUsers.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -215,6 +218,34 @@
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="jar://$PROJECT_DIR$/../../../../../../../Program Files/Java/jdk-23/lib/src.zip!/java.base/java/net/URI.java" root0="SKIP_INSPECTION" />
+  </component>
+  <component name="LineStatusTrackerManager">
+    <file path="$PROJECT_DIR$/src/main/java/tukano/impl/JavaUsers.java">
+      <ranges>
+        <range start1="14" end1="14" start2="14" end2="16" changelist="3c442bf9-271c-4bdd-b717-b59d56f8b66c" />
+        <range start1="15" end1="15" start2="17" end2="18" changelist="3c442bf9-271c-4bdd-b717-b59d56f8b66c" />
+        <range start1="24" end1="24" start2="27" end2="28" changelist="3c442bf9-271c-4bdd-b717-b59d56f8b66c" />
+        <range start1="29" end1="29" start2="33" end2="34" changelist="3c442bf9-271c-4bdd-b717-b59d56f8b66c" />
+        <range start1="42" end1="42" start2="47" end2="49" changelist="3c442bf9-271c-4bdd-b717-b59d56f8b66c" />
+        <range start1="43" end1="43" start2="50" end2="52" changelist="3c442bf9-271c-4bdd-b717-b59d56f8b66c" />
+        <range start1="44" end1="44" start2="53" end2="55" changelist="3c442bf9-271c-4bdd-b717-b59d56f8b66c" />
+        <range start1="95" end1="95" start2="106" end2="107" changelist="3c442bf9-271c-4bdd-b717-b59d56f8b66c" />
+        <range start1="101" end1="103" start2="113" end2="122" changelist="3c442bf9-271c-4bdd-b717-b59d56f8b66c" />
+        <range start1="107" end1="116" start2="126" end2="145" changelist="3c442bf9-271c-4bdd-b717-b59d56f8b66c" />
+        <range start1="127" end1="127" start2="156" end2="167" changelist="3c442bf9-271c-4bdd-b717-b59d56f8b66c" />
+        <range start1="158" end1="158" start2="198" end2="199" changelist="3c442bf9-271c-4bdd-b717-b59d56f8b66c" />
+        <range start1="163" end1="163" start2="204" end2="206" changelist="3c442bf9-271c-4bdd-b717-b59d56f8b66c" />
+        <range start1="165" end1="166" start2="208" end2="218" changelist="3c442bf9-271c-4bdd-b717-b59d56f8b66c" />
+        <range start1="168" end1="168" start2="220" end2="221" changelist="3c442bf9-271c-4bdd-b717-b59d56f8b66c" />
+        <range start1="170" end1="170" start2="223" end2="226" changelist="5e6b6627-f8e5-46a8-b838-e201a24495fc" />
+        <range start1="171" end1="171" start2="227" end2="234" changelist="5e6b6627-f8e5-46a8-b838-e201a24495fc" />
+        <range start1="198" end1="198" start2="261" end2="278" changelist="3c442bf9-271c-4bdd-b717-b59d56f8b66c" />
+        <range start1="206" end1="206" start2="286" end2="287" changelist="5e6b6627-f8e5-46a8-b838-e201a24495fc" />
+        <range start1="208" end1="208" start2="289" end2="303" changelist="5e6b6627-f8e5-46a8-b838-e201a24495fc" />
+        <range start1="220" end1="220" start2="315" end2="319" changelist="5e6b6627-f8e5-46a8-b838-e201a24495fc" />
+        <range start1="221" end1="221" start2="320" end2="329" changelist="5e6b6627-f8e5-46a8-b838-e201a24495fc" />
+      </ranges>
+    </file>
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />

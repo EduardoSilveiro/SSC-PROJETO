@@ -22,7 +22,9 @@ public class UserDAO extends  User {
     public UserDAO(User user) {
         super(user.userId(), user.pwd(), user.email(), user.displayName());
     }
-
+public User toUser() {
+    return new User(getUserId(),getPwd(),getEmail(),getDisplayName());
+}
     public String get_rid() {
         return _rid;
     }

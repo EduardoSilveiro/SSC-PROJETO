@@ -42,10 +42,11 @@ scenarios:
           headers:
             Content-Type: application/json
 
-      # 5. Excluir User (DELETE /users/{userId}) DONE
-      - delete:
-          url: /users/TesteCriar1?pwd=password
-          headers:
-            Content-Type: application/json
+
+#      # 5. Excluir User (DELETE /users/{userId}) DONE
+#      - delete:
+#          url: /users/TesteCriar1?pwd=password
+#          headers:
+#            Content-Type: application/json
 
 

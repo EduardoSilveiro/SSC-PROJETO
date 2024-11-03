@@ -132,8 +132,10 @@ public class JavaUsers implements Users {
 
 
 						cache.setValue(key,userDAO);
-						Log.info(() -> format("Cache data is completed for user: " + userDAO.getUserId()));
 
+						Log.info(() -> format("Cache data is completed for user: " + userDAO.getUserId()));
+					var value = cache.getValue(key,UserDAO.class);
+					Log.info(() -> format("getFromCache : " + value));
 				}
 				users.createItem(userDAO).getItem() ;
 
@@ -147,7 +149,6 @@ public class JavaUsers implements Users {
 			}
 		}
 	}
-	//NOT TESTED
 	private Result<User> getUserFromCosmos(String userId, String pwd) {
 		try {
 			init();
@@ -184,15 +185,16 @@ public class JavaUsers implements Users {
 		}
 		if (CACHE_MODE) {
 			var key = "users:" + userId;
-			var value = getFromCache(userId, pwd);
+			var value = cache.getValue(key,UserDAO.class);
+			Log.info(() -> format("getFromCache : " + value));
 
 			try {
 				if (value != null) {
-					if (!value.get(userId).getPwd().equals(pwd)) {
+					if (!value.getPwd().equals(pwd)) {
 						return Result.error(FORBIDDEN);
 					}
-					cache.setValue(key, value.get(key));
-					User user = new User(value.get(key).getUserId(), value.get(key).getPwd(), value.get(key).getEmail(), value.get(key).getDisplayName());
+
+					User user = new User(value.getUserId(), value.getPwd(), value.getEmail(), value.getDisplayName());
 					Log.info(() -> format("User from cache   " + user.getUserId()));
 					return Result.ok(user);
 				}
@@ -306,9 +308,7 @@ public class JavaUsers implements Users {
 		  if (!value.getPwd().equals(pwd)) {
 			  return null;
 		  }
-
-
-		  Map<String,UserDAO> userMap = new HashMap<>();
+ 		  Map<String,UserDAO> userMap = new HashMap<>();
 		  userMap.put(key1,value);
 		  return userMap;
 
@@ -331,8 +331,7 @@ public class JavaUsers implements Users {
 				cache.delete("users:" + userId );
 				Log.info("Cache data is deleted for PostSQL: " );
 
-					// Delete user shorts and related info asynchronously in a separate thread
-					Executors.defaultThreadFactory().newThread( () -> {
+ 					Executors.defaultThreadFactory().newThread( () -> {
 						JavaShorts.getInstance().deleteAllShorts(userId, pwd, Token.get(userId));
 						JavaBlobs.getInstance().deleteAllBlobs(userId, Token.get(userId));
 					}).start();
@@ -355,15 +354,13 @@ public class JavaUsers implements Users {
 			if(userMap !=null) {
 				User postUser =  userMap.get("users:" + userId);
 				cache.delete("users:" + userId );
-				Log.info("Cache data is deleted for PostSQL: " );
+				Log.info("Cache data is deleted for cosmoos: " );
 
 				// Delete user shorts and related info asynchronously in a separate thread
 				Executors.defaultThreadFactory().newThread( () -> {
 					JavaShorts.getInstance().deleteAllShorts(userId, pwd, Token.get(userId));
 					JavaBlobs.getInstance().deleteAllBlobs(userId, Token.get(userId));
 				}).start();
-				UserDAO userDAO = new UserDAO(postUser);
-				return Result.ok(userDAO);
 
 			}
 			CosmosItemResponse<UserDAO> response = users.readItem(userId, new PartitionKey(userId), UserDAO.class);
@@ -407,18 +404,18 @@ public class JavaUsers implements Users {
 		try {
 			init();
 
-			// Prepare the query - using string concatenation for pattern matching
+
 			String queryText = String.format(
 					"SELECT * FROM User u WHERE CONTAINS(UPPER(u.userId), '%s')",
-					pattern.toUpperCase().replace("'", "''") // Escape single quotes to prevent issues
+					pattern.toUpperCase().replace("'", "''")
 			);
 
-			// Execute the query
+
 			CosmosPagedIterable<UserDAO> results = users.queryItems(queryText, new CosmosQueryRequestOptions(), UserDAO.class);
 
-			// Process the results, converting UserDAO to User and copying without password
+
 			List<User> hits = results.stream()
-					.map(this::convertToUser) // Convert UserDAO to User
+					.map(this::convertToUser)
 					.collect(Collectors.toList());
 
 			return Result.ok(hits);

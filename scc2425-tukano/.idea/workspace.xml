@@ -6,11 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="3c442bf9-271c-4bdd-b717-b59d56f8b66c" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/utils/Constants.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/utils/Constants.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tukano/impl/JavaUsers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tukano/impl/JavaUsers.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/test/test/Test.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/test/test/Test.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/test/Test.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/test/Test.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/tukano/impl/JavaUsers.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/impl/JavaUsers.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/utils/Constants.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/utils/Constants.class" afterDir="false" />
     </list>
     <list id="5e6b6627-f8e5-46a8-b838-e201a24495fc" name="Changes by tomas" comment="">
       <change beforePath="$PROJECT_DIR$/src/main/java/tukano/impl/JavaUsers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tukano/impl/JavaUsers.java" afterDir="false" />
@@ -32,6 +31,20 @@
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="jar://$PROJECT_DIR$/../../../../../../../Program Files/Java/jdk-23/lib/src.zip!/java.base/java/net/URI.java" root0="SKIP_INSPECTION" />
+  </component>
+  <component name="LineStatusTrackerManager">
+    <file path="$PROJECT_DIR$/src/main/java/tukano/impl/JavaUsers.java">
+      <ranges>
+        <range start1="134" end1="134" start2="134" end2="135" changelist="5e6b6627-f8e5-46a8-b838-e201a24495fc" />
+        <range start1="135" end1="136" start2="136" end2="138" changelist="5e6b6627-f8e5-46a8-b838-e201a24495fc" />
+        <range start1="149" end1="150" start2="151" end2="151" changelist="3c442bf9-271c-4bdd-b717-b59d56f8b66c" />
+        <range start1="186" end1="187" start2="187" end2="189" changelist="5e6b6627-f8e5-46a8-b838-e201a24495fc" />
+        <range start1="190" end1="191" start2="192" end2="193" changelist="5e6b6627-f8e5-46a8-b838-e201a24495fc" />
+        <range start1="193" end1="195" start2="195" end2="197" changelist="5e6b6627-f8e5-46a8-b838-e201a24495fc" />
+        <range start1="357" end1="358" start2="359" end2="360" changelist="5e6b6627-f8e5-46a8-b838-e201a24495fc" />
+        <range start1="365" end1="366" start2="367" end2="368" changelist="5e6b6627-f8e5-46a8-b838-e201a24495fc" />
+      </ranges>
+    </file>
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />

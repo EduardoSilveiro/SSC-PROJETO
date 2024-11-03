@@ -41,7 +41,7 @@ public class Test {
 		var users = new RestUsersClient( serverURI);
 		var shorts = new RestShortsClient(serverURI);
 
-
+//
 //	 users.createUser( new User("wales", "12345", "jimmy@wikipedia.pt", "Jimmy Wales")) ;
 //  users.createUser( new User("liskov", "54321", "liskov@mit.edu", "Barbara Liskov")) ;
 //		 show(users.createUser( new User("eduardo", "54321", "liskov@mit.edu", "Barbara Liskov") ));
@@ -49,7 +49,7 @@ public class Test {
 // show(users.createUser( new User("jojjao", "54321", "liskov@mit.edu", "Barbara Liskov") ));
 // show(users.createUser( new User("jo2jjao", "54321", "liskov@mit.edu", "Barbara Liskov") ));
 
-		//show(users.deleteUser("eduardo", "54321"));
+		show(users.deleteUser("wales", "12345"));
 
 		show(users.getUser("wales", "12345"));
 		show(users.getUser("liskov", "54321"));

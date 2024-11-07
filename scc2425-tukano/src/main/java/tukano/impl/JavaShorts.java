@@ -1,13 +1,12 @@
 package tukano.impl;
 
 import static java.lang.String.format;
+import static tukano.api.Result.ErrorCode.*;
 import static tukano.api.Result.error;
 import static tukano.api.Result.errorOrResult;
 import static tukano.api.Result.errorOrValue;
 import static tukano.api.Result.errorOrVoid;
 import static tukano.api.Result.ok;
-import static tukano.api.Result.ErrorCode.BAD_REQUEST;
-import static tukano.api.Result.ErrorCode.FORBIDDEN;
 import static utils.DB.getOne;
 import java.net.URI;
 import java.nio.ByteBuffer;
@@ -48,9 +47,9 @@ import utils.Hash;
 public class JavaShorts implements Shorts {
 
 	private static Logger Log = Logger.getLogger(JavaShorts.class.getName());
-	private static final String CONNECTION_URL = Constants.eduardoConst.getDbUrl();
-	private static final String DB_KEY = Constants.eduardoConst.getDbKey();
-	private static final String DB_NAME = Constants.eduardoConst.getDbName();
+	private static final String CONNECTION_URL = Constants.tomasConst.getDbUrl();
+	private static final String DB_KEY = Constants.tomasConst.getDbKey();
+	private static final String DB_NAME = Constants.tomasConst.getDbName();
 	private static Shorts instance;
 	private static RedisCache cache = RedisCache.getInstance(); // Cache instance
 	public static boolean CACHE_MODE = Constants.eduardoConst.isCacheActive();
@@ -159,7 +158,7 @@ public class JavaShorts implements Shorts {
 //				var blobUrl1 = URI.create(shortDAO.getBlobUrl());
 //				var token = blobUrl1.getQuery().split("=")[1];
 //				JavaBlobs.getInstance().upload(blobUrl.toString() ,randomBytes( 100 ),token );
-				return Result.ok(null);
+				return Result.ok(shrt);
 			}  catch (CosmosException e) {
 				Log.info("Error creating short: " + e.getMessage());
 				e.printStackTrace();
@@ -257,8 +256,8 @@ public class JavaShorts implements Shorts {
 					}
 
 					// Delete the blob associated with the short
-					JavaBlobs.getInstance().delete(shrt.getBlobUrl(), Token.get());
-					return Result.ok(null);
+					// JavaBlobs.getInstance().delete(shrt.getBlobUrl(), Token.get());
+					return Result.ok( );
 				} catch (Exception e) {
 					Log.severe(() -> "Error deleting short: " + e.getMessage());
 					return Result.error(Result.ErrorCode.INTERNAL_ERROR);
@@ -326,7 +325,7 @@ public class JavaShorts implements Shorts {
 
 					FollowingDAO followingDAO1 = response.getItem();
 					Log.info(followingDAO1.toString());
-					return Result.ok( );
+					return Result.ok(  );
 
 				} else {
 					following.deleteItem(userId1, new PartitionKey(userId1), new CosmosItemRequestOptions()).getItem();

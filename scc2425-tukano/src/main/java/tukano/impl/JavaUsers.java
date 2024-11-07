@@ -36,9 +36,9 @@ import utils.JSON;
 public class JavaUsers implements Users {
 
 	private static Logger Log = Logger.getLogger(JavaUsers.class.getName());
-	private static final String CONNECTION_URL = Constants.eduardoConst.getDbUrl();
-	private static final String DB_KEY = Constants.eduardoConst.getDbKey();
-	private static final String DB_NAME = Constants.eduardoConst.getDbName();
+	private static final String CONNECTION_URL = Constants.tomasConst.getDbUrl();
+	private static final String DB_KEY = Constants.tomasConst.getDbKey();
+	private static final String DB_NAME = Constants.tomasConst.getDbName();
 	private static Users instance;
 
 	private CosmosClient client;
@@ -139,7 +139,7 @@ public class JavaUsers implements Users {
 				}
 				users.createItem(userDAO).getItem() ;
 
-				return Result.ok(null);
+				return Result.ok(user.getUserId());
 
 			} catch (CosmosException e) {
 				Log.info(() -> format("UserDAO4444 : %s\n"));

@@ -57,13 +57,13 @@ public class TukanoRestServer extends Application {
 
 
 	public static void main(String[] args) throws Exception {
-		Args.use(args);
+		//Args.use(args);
 
-		Token.setSecret( Args.valueOf("-secret", ""));
-		Props.load( Args.valueOf("-props", "").split(","));
+		//Token.setSecret( Args.valueOf("-secret", ""));
+		//Props.load( Args.valueOf("-props", "").split(","));
 
 		new TukanoRestServer().start();
-		return;
+
 	}
 
 	@Override

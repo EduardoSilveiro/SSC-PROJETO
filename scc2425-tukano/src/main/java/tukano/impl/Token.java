@@ -9,7 +9,7 @@ public class Token {
 
 	private static final String DELIMITER = "-";
 	private static final long MAX_TOKEN_AGE = 300000;
-	private static String secret;
+	private static String secret  = "";
 
 	public static void setSecret(String s) {
 		secret = s;

@@ -397,6 +397,7 @@ public class JavaShorts implements Shorts {
 					// If the user likes the short, add the like
 					if (isLiked) {
 						CosmosItemResponse<LikesDAO> response = likes.createItem(like);
+
 						Log.info(() -> format("Liked item created: %s", response.getItem()));
 
 						// Increment the totalLikes in the shorts container

@@ -14,17 +14,17 @@ import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
-import com.azure.cosmos.models.CosmosItemResponse;
-import com.azure.cosmos.models.CosmosItemRequestOptions;
+
+import com.azure.cosmos.models.*;
 import com.azure.cosmos.CosmosContainer;
 import com.azure.cosmos.CosmosClient;
 import com.azure.cosmos.CosmosClientBuilder;
-import com.azure.cosmos.models.CosmosQueryRequestOptions;
-import com.azure.cosmos.models.SqlQuerySpec;
-import com.azure.cosmos.models.PartitionKey;
 import com.azure.cosmos.util.CosmosPagedIterable;
+
+import redis.clients.jedis.resps.Tuple;
 import tukano.api.*;
 import tukano.api.Short;
+import tukano.api.azure.RedisCache;
 import tukano.impl.data.FollowingDAO;
 import tukano.impl.data.LikesDAO;
 import utils.Constants;
@@ -52,6 +52,8 @@ public class JavaShorts implements Shorts {
 	private static final String DB_KEY = Constants.eduardoConst.getDbKey();
 	private static final String DB_NAME = Constants.eduardoConst.getDbName();
 	private static Shorts instance;
+	private static RedisCache cache = RedisCache.getInstance(); // Cache instance
+	public static boolean CACHE_MODE = Constants.eduardoConst.isCacheActive();
 
 	public static String DB_MODE = Constants.eduardoConst.getDbMode();
 
@@ -65,9 +67,7 @@ public class JavaShorts implements Shorts {
 			CosmosClient client = new CosmosClientBuilder()
 					.endpoint(CONNECTION_URL)
 					.key(DB_KEY)
-					// .directMode()
 					.gatewayMode()
-					// replace by .directMode() for better performance
 					.consistencyLevel(ConsistencyLevel.SESSION)
 					.connectionSharingAcrossClientsEnabled(true)
 					.contentResponseOnWriteEnabled(true)
@@ -81,11 +81,9 @@ public class JavaShorts implements Shorts {
 	private CosmosDatabase db;
 	private CosmosContainer shorts;
 	private CosmosContainer following;
-
 	private CosmosContainer likes;
-	private CosmosContainer feeds;
-	private JavaShorts(CosmosClient client) {this.client = client;}
 
+	private JavaShorts(CosmosClient client) { this.client = client; }
 	public JavaShorts(){}
 
 	private synchronized void initShorts() {
@@ -105,48 +103,68 @@ public class JavaShorts implements Shorts {
 			likes = client.getDatabase(DB_NAME).getContainer("likes");
 		}
 	}
+
 	@Override
 	public Result<Short> createShort(String userId, String password) {
 		Log.info(() -> format("createShort : userId = %s, pwd = %s\n", userId, password));
 
 		if(DB_MODE.equalsIgnoreCase("post")){
-			return errorOrResult( okUser(userId, password), user -> {
+			return errorOrResult(okUser(userId, password), user -> {
 
 				var shortId = format("%s+%s", userId, UUID.randomUUID());
 				var blobUrl = format("%s/%s/%s", TukanoRestServer.serverURI, Blobs.NAME, shortId);
 				var shrt = new Short(shortId, userId, blobUrl);
+
 				var blobUrl1 = URI.create(shrt.getBlobUrl());
 				var token = blobUrl1.getQuery().split("=")[1];
 				JavaBlobs.getInstance().upload(blobUrl ,randomBytes( 100 ),token );
-				return errorOrValue(DB.insertOne(shrt), s -> s.copyWithLikes_And_Token(0));
+				// Save in DB and Cache
+				errorOrValue(DB.insertOne(shrt), s -> s.copyWithLikes_And_Token(0));
+
+				// Cache the short after creation
+				if (CACHE_MODE) {
+					var cacheKey = "shorts:" + shortId;
+					cache.setValue(cacheKey, shrt);
+					Log.info(() -> format("Cache data is completed for short: %s", shortId));
+				}
+
+				return Result.ok(shrt);
 			});
 		}
-		return errorOrResult( okUser(userId, password), user -> {
-			try {
 
+		return errorOrResult(okUser(userId, password), user -> {
+			try {
 				var shortId = format("%s+%s", userId, UUID.randomUUID());
 				var blobUrl = format("%s/%s/%s", TukanoRestServer.serverURI, Blobs.NAME, shortId);
 				var shrt = new Short(shortId, userId, blobUrl);
 
-				initShorts() ;
-				ShortDAO shortDAO  = new ShortDAO(shrt).copyWithLikes_And_Token(0);
+				initShorts();
+				ShortDAO shortDAO = new ShortDAO(shrt)      ;
+						//.copyWithLikes_And_Token(0) ;
 				Log.info(() -> format("ShortDAO : %s\n", shortDAO));
 				Log.info(() -> format("Short  : %s\n", shrt));
 
-				 shorts.createItem(shortDAO).getItem().toShort() ;
 
-				Short s = shortDAO.toShort();
+				CosmosItemResponse<ShortDAO> response = shorts.createItem(shortDAO) ;
+				ShortDAO shortDAO2  = response.getItem();
+				Log.info(() -> format("Created item: %s", shortDAO2 ));
 
-				var blobUrl1 = URI.create(s.getBlobUrl());
-				var token = blobUrl1.getQuery().split("=")[1];
-				JavaBlobs.getInstance().upload(blobUrl ,randomBytes( 100 ),token );
-				return  Result.ok( s  )   ;
-			} catch (Exception x) {
-				Log.info("Error creating short: " + x.getMessage());
-				x.printStackTrace();
+				// Cache after DB update
+				if (CACHE_MODE) {
+					var cacheKey = "shorts:" + shortId;
+					cache.setValue(cacheKey, shrt);
+					Log.info(() -> format("Cache data is completed for short: %s", shortId));
+				}
+
+//				var blobUrl1 = URI.create(shortDAO.getBlobUrl());
+//				var token = blobUrl1.getQuery().split("=")[1];
+//				JavaBlobs.getInstance().upload(blobUrl.toString() ,randomBytes( 100 ),token );
+				return Result.ok(null);
+			}  catch (CosmosException e) {
+				Log.info("Error creating short: " + e.getMessage());
+				e.printStackTrace();
 				return Result.error(Result.ErrorCode.INTERNAL_ERROR);
 			}
-
 		});
 	}
 
@@ -158,15 +176,18 @@ public class JavaShorts implements Shorts {
 			return error(BAD_REQUEST);
 		}
 
-		if(DB_MODE.equalsIgnoreCase("post")){
-			var query = format("SELECT count(*) FROM Likes l WHERE l.shortId = '%s'", shortId);
-			var likes = DB.sql(query, Long.class);
-			return errorOrValue( getOne(shortId, Short.class), shrt -> shrt.copyWithLikes_And_Token( likes.get(0)));
+		// First, check if the short is cached
+		if (CACHE_MODE) {
+			var cacheKey = "shorts:" + shortId;
+			Short cachedShort = cache.getValue(cacheKey, Short.class);
+			if (cachedShort != null) {
+				Log.info(() -> format("Cache hit for shortId: %s", shortId));
+				return Result.ok(cachedShort);
+			}
 		}
 
 		try {
-			initShorts() ;
-
+			initShorts();
 			CosmosItemResponse<ShortDAO> response = shorts.readItem(shortId, new PartitionKey(shortId), ShortDAO.class);
 			ShortDAO shortDAO = response.getItem();
 
@@ -174,35 +195,43 @@ public class JavaShorts implements Shorts {
 			Log.info(() -> format("ShortDAO : %s\n", shortDAO));
 			Log.info(() -> format("Short  : %s\n", shrt));
 
+			// Cache the result for future access
+			if (CACHE_MODE) {
+				var cacheKey = "shorts:" + shortId;
+				cache.setValue(cacheKey, shrt);
+				Log.info(() -> format("Cache data is completed for short: %s", shortId));
+			}
+
 			return Result.ok(shrt);
 		} catch (CosmosException e) {
 			Log.info("Error getting short: " + e.getMessage());
 			e.printStackTrace();
 			return Result.error(Result.ErrorCode.INTERNAL_ERROR);
 		}
-
 	}
-
 
 	@Override
 	public Result<Void> deleteShort(String shortId, String password) {
 		Log.info(() -> format("deleteShort : shortId = %s, pwd = %s\n", shortId, password));
 
-
-		if(DB_MODE.equalsIgnoreCase("post")){
-			return errorOrResult( getShort(shortId), shrt ->
-						errorOrResult( okUser( shrt.getOwnerId(), password), user ->
+		if (DB_MODE.equalsIgnoreCase("post")) {
+			return errorOrResult(getShort(shortId), shrt ->
+					errorOrResult(okUser(shrt.getOwnerId(), password), user ->
 							DB.transaction(hibernate -> {
-				hibernate.remove( shrt);
-
-				var query = format("DELETE Likes l WHERE l.shortId = '%s'", shortId);
-				hibernate.createNativeQuery( query, Likes.class).executeUpdate();
-
-				JavaBlobs.getInstance().delete(shrt.getBlobUrl(), Token.get() );
-			})));
+								hibernate.remove(shrt);
+								// Invalidate cache after deletion
+								if (CACHE_MODE) {
+									var cacheKey = "shorts:" + shortId;
+									cache.delete(cacheKey);
+									Log.info(() -> format("Cache invalidated for short: %s", shortId));
+								}
+								var query = format("DELETE Likes l WHERE l.shortId = '%s'", shortId);
+								hibernate.createNativeQuery(query, Likes.class).executeUpdate();
+								JavaBlobs.getInstance().delete(shrt.getBlobUrl(), Token.get());
+							})));
 		}
 
- 		return errorOrResult(getShort(shortId), shrt -> {
+		return errorOrResult(getShort(shortId), shrt -> {
 			return errorOrResult(okUser(shrt.getOwnerId(), password), user -> {
 				initShorts();
 				initLikes();
@@ -210,8 +239,13 @@ public class JavaShorts implements Shorts {
 				// Execute a transaction-like operation
 				try {
 					// Delete the short
-					shorts.deleteItem(shortId, new PartitionKey(shortId),  new CosmosItemRequestOptions()).getItem() ; // Use appropriate partition key
-					// following.deleteItem(userId1, new PartitionKey(userId1), new CosmosItemRequestOptions()).getItem();
+					shorts.deleteItem(shortId, new PartitionKey(shortId), new CosmosItemRequestOptions()).getItem(); // Use appropriate partition key
+					// Remove from cache
+					if (CACHE_MODE) {
+						var cacheKey = "shorts:" + shortId;
+						cache.delete(cacheKey);
+						Log.info(() -> format("Cache invalidated for short: %s", shortId));
+					}
 
 					// Delete likes associated with the shortId
 					String query = String.format("SELECT * FROM c WHERE c.shortId = '%s'", shortId);
@@ -219,21 +253,21 @@ public class JavaShorts implements Shorts {
 
 					// Remove each like associated with the shortId
 					for (LikesDAO like : allLikes) {
-						likes.deleteItem(like.getId(), new PartitionKey(like.getOwnerId()) ,new CosmosItemRequestOptions()).getItem() ;
+						likes.deleteItem(like.getId(), new PartitionKey(like.getOwnerId()), new CosmosItemRequestOptions()).getItem();
 					}
 
 					// Delete the blob associated with the short
 					JavaBlobs.getInstance().delete(shrt.getBlobUrl(), Token.get());
-
-					return ok(null);
-				} catch (CosmosException e) {
-					Log.info("Error deleting short: " + e.getMessage());
-					e.printStackTrace();
+					return Result.ok(null);
+				} catch (Exception e) {
+					Log.severe(() -> "Error deleting short: " + e.getMessage());
 					return Result.error(Result.ErrorCode.INTERNAL_ERROR);
 				}
 			});
 		});
 	}
+
+
 
 
 	@Override
@@ -274,8 +308,8 @@ public class JavaShorts implements Shorts {
 
 		if(DB_MODE.equalsIgnoreCase("post")){
 			return errorOrResult(okUser(userId1, password), user -> {
-			var f = new Following(userId1, userId2);
-			return errorOrVoid(okUser(userId2), isFollowing ? DB.insertOne(f) : DB.deleteOne(f));
+				var f = new Following(userId1, userId2);
+				return errorOrVoid(okUser(userId2), isFollowing ? DB.insertOne(f) : DB.deleteOne(f));
 
 			});
 		}
@@ -303,8 +337,8 @@ public class JavaShorts implements Shorts {
 				Log.info("Error following: " + e.getMessage());
 				e.printStackTrace();
 				return Result.error(Result.ErrorCode.INTERNAL_ERROR);
-				}
- 		});
+			}
+		});
 	}
 
 
@@ -345,32 +379,38 @@ public class JavaShorts implements Shorts {
 	}
 
 
-	@Override
 	public Result<Void> like(String shortId, String userId, boolean isLiked, String password) {
 		Log.info(() -> format("like : shortId = %s, userId = %s, isLiked = %s, pwd = %s\n", shortId, userId, isLiked, password));
 
-		if(DB_MODE.equalsIgnoreCase("post")) {
-			return errorOrResult( getShort(shortId), shrt -> {
-				var l = new Likes(userId, shortId, shrt.getOwnerId());
-				return errorOrVoid( okUser( userId, password), isLiked ? DB.insertOne( l ) : DB.deleteOne( l ));
-			});
-
-		}
+		if (DB_MODE.equalsIgnoreCase("post")) {
 			return errorOrResult(getShort(shortId), shrt -> {
+				var l = new Likes(userId, shortId, shrt.getOwnerId());
+				return errorOrVoid(okUser(userId, password), isLiked ? DB.insertOne(l) : DB.deleteOne(l));
+			});
+		}
 
+		return errorOrResult(getShort(shortId), shrt -> {
 			return errorOrResult(okUser(userId, password), user -> {
 				try {
 					initLikes();
 					LikesDAO like = new LikesDAO(userId, shortId, shrt.getOwnerId());
-					if (isLiked) {
 
+					// If the user likes the short, add the like
+					if (isLiked) {
 						CosmosItemResponse<LikesDAO> response = likes.createItem(like);
 						Log.info(() -> format("Liked item created: %s", response.getItem()));
-					} else {
 
+						// Increment the totalLikes in the shorts container
+						updateTotalLikes(shortId, 1);
+					} else {
+						// If the user unlikes the short, remove the like
 						likes.deleteItem(like.getId(), new PartitionKey(like.getId()), new CosmosItemRequestOptions());
 						Log.info(() -> format("Like item deleted for: %s", like.getId()));
+
+						// Decrement the totalLikes in the shorts container
+						updateTotalLikes(shortId, -1);
 					}
+
 					return Result.ok();
 				} catch (CosmosException e) {
 					Log.info("Error liking: " + e.getMessage());
@@ -380,6 +420,33 @@ public class JavaShorts implements Shorts {
 			});
 		});
 	}
+
+	// Helper method to update the totalLikes field in the shorts container
+	private void updateTotalLikes(String shortId, int likeChange) {
+		try {
+			// Read the current short from the Cosmos DB
+			initShorts();
+			CosmosItemResponse<ShortDAO> response = shorts.readItem(shortId, new PartitionKey(shortId), ShortDAO.class);
+			ShortDAO shortDAO = response.getItem();
+
+			// Update the totalLikes field
+			int newTotalLikes = shortDAO.getTotalLikes() + likeChange;
+			shortDAO.setTotalLikes(newTotalLikes);
+
+			// Update the short in the database
+			shorts.replaceItem(shortDAO, shortId, new PartitionKey(shortId), new CosmosItemRequestOptions());
+
+			// Update the cache after modifying the totalLikes
+			if (CACHE_MODE) {
+				var cacheKey = "shorts:" + shortId;
+				cache.setValue(cacheKey, shortDAO.toShort());  // Ensure the cache reflects the updated totalLikes
+				Log.info(() -> format("Cache data updated for short: %s with new totalLikes: %d", shortId, newTotalLikes));
+			}
+		} catch (CosmosException e) {
+			Log.severe(() -> "Error updating totalLikes for shortId: " + shortId + " : " + e.getMessage());
+		}
+	}
+
 
 
 	@Override
@@ -395,7 +462,7 @@ public class JavaShorts implements Shorts {
 				return errorOrValue( okUser( shrt.getOwnerId(), password ), DB.sql(query, String.class));
 			});
 		}
-			return errorOrResult(getShort(shortId), shrt -> {
+		return errorOrResult(getShort(shortId), shrt -> {
 			return errorOrResult(okUser(shrt.getOwnerId(), password), user -> {
 				try {
 					initLikes(); // Ensure we are using the "likes" container
@@ -424,72 +491,174 @@ public class JavaShorts implements Shorts {
 
 	@Override
 	public Result<List<String>> getFeed(String userId, String password) {
-		Log.info(() -> format("getFeed : userId = %s, pwd = %s\n", userId, password));
-
-//		final var SHORT_QUERY = format("SELECT s.shortId, s.timestamp FROM Short s WHERE	s.ownerId = '%s'" , userId);
-
-// 		List<Map> query1 = cosmos.query(Map.class , SHORT_QUERY, shorts).value();
-
-////		List<Tuple<String, Long >> res1 = query1.stream()
-//				.map(result -> new Tuple<>((String) result.get("shortId"), (Long) result.get("timestamp")))
-//				.collect(Collectors.toList());
-
-//		final var FOLLOW_QUERY = format("SELECT f.followee Following f WHERE f.follower = '%s'", userId);
-//		List<Map> query2 = cosmos.query(Map.class , FOLLOW_QUERY, following).value();
-////		List<String> followees = query2.stream().map(result -> result.get("followee").toString()).toList() ;
-
-//		List<Tuple<String, Long >> resultTuples =new ArrayList<>() ;
-
-//		for(String f : followees)  {}
-
-//		res1.addAll(resultTuples);
-
-		//	res1.sort((t1,t2) -> Long.compare(t2.getT2(), t1.getT2()));
-
-//		List<String> result =new ArrayList<>();
-//		for (Tuple<String, Long> s : res1) {
-//			result.add(s.getT1());
+//		Log.info(() -> format("getFeed : userId = %s, pwd = %s\n", userId, password));
+//
+//		// Check if we are in 'Post' mode or 'Cosmos' mode
+//		if (DB_MODE.equalsIgnoreCase("post")) {
+//			// Use DB.sql to fetch the user's posts (shorts where ownerId = userId)
+//			final var SHORT_QUERY = "SELECT s.shortId, s.timestamp FROM Short s WHERE s.ownerId = :userId";
+//			List<Object[]> userPosts = DB.sql(SHORT_QUERY, Object[].class, userId);
+//
+//			// Use DB.sql to fetch the followees for the user
+//			final var FOLLOW_QUERY = "SELECT f.followee FROM Following f WHERE f.follower = :userId";
+//			List<String> followees = DB.sql(FOLLOW_QUERY, String.class, userId);
+//
+//			// Collect posts from followees
+//			List<Tuple<String, Long>> resultTuples = new ArrayList<>();
+//			for (String followee : followees) {
+//				// Query followee posts (shorts where ownerId = followee)
+//				String followeeQuery = "SELECT s.shortId, s.timestamp FROM Short s WHERE s.ownerId = :followee";
+//				List<Object[]> followeePosts = DB.sql(followeeQuery, Object[].class, followee);
+//				for (Object[] post : followeePosts) {
+//					resultTuples.add(new Tuple<>((String) post[0], (Long) post[1]));
+//				}
+//			}
+//
+//			// Add the user's own posts to the result
+//			for (Object[] post : userPosts) {
+//				resultTuples.add(new Tuple<>((String) post[0], (Long) post[1]));
+//			}
+//
+//			// Sort all posts by timestamp in descending order
+//			resultTuples.sort((t1, t2) -> Long.compare(t2.getT2(), t1.getT2()));
+//
+//			// Extract sorted shortIds into a result list
+//			List<String> result = resultTuples.stream()
+//					.map(Tuple::getT1)
+//					.collect(Collectors.toList());
+//
+//			return Result.ok(result);
 //		}
- return Result.ok( )	;
-	}
-		
+//
+//		// Case for 'Cosmos' mode (assuming it is not implemented with Hibernate)
+//		try {
+//			// Use Hibernate to fetch the posts of the user (similar to 'post' mode)
+//			String userShortQuery = "SELECT s.shortId, s.timestamp FROM Short s WHERE s.ownerId = :userId";
+//			List<Object[]> userPosts = DB.sql(userShortQuery, Object[].class, userId);
+//
+//			// Fetch the users the user is following
+//			String followeeQuery = "SELECT f.followee FROM Following f WHERE f.follower = :userId";
+//			List<String> followeesResponse = DB.sql(followeeQuery, String.class, userId);
+//
+//			// Collect followees from the query
+//			List<String> followees = followeesResponse.stream()
+//					.collect(Collectors.toList());
+//
+//			// List to hold all posts
+//			List<Tuple<String, Long>> resultTuples = new ArrayList<>();
+//
+//			// Add the user's own posts to the list
+//			for (Object[] post : userPosts) {
+//				resultTuples.add(new Tuple<>((String) post[0], (Long) post[1]));
+//			}
+//
+//			// Add the posts from each followee to the list
+//			for (String followee : followees) {
+//				String followeePostQuery = "SELECT s.shortId, s.timestamp FROM Short s WHERE s.ownerId = :ownerId";
+//				List<Object[]> followeePosts = DB.sql(followeePostQuery, Object[].class, followee);
+//				for (Object[] post : followeePosts) {
+//					resultTuples.add(new Tuple<>((String) post[0], (Long) post[1]));
+//				}
+//			}
+//
+//			// Sort all posts by timestamp in descending order
+//			resultTuples.sort((t1, t2) -> Long.compare(t2.getT2(), t1.getT2()));
+//
+//			// Extract shortIds into a result list
+//			List<String> result = resultTuples.stream()
+//					.map(Tuple::getT1)
+//					.collect(Collectors.toList());
+//
+//			return Result.ok(result);
+//
+//		} catch (Exception e) {
+//			Log.severe(() -> "Error fetching feed: " + e.getMessage());
+//			return Result.error(Result.ErrorCode.INTERNAL_ERROR);
+//		}
+		return ok();}
+
+
+
 	protected Result<User> okUser( String userId, String pwd) {
 		return JavaUsers.getInstance().getUser(userId, pwd);
 	}
-	
+
 	private Result<Void> okUser( String userId ) {
 		var res = okUser( userId, "");
-		Log.info("Error getting CAFAA: " + res.toString()) ;
+		Log.info("Error getting : " + res.toString()) ;
 
 		if( res.toString().equals("(FORBIDDEN)")  )
 			return ok();
 		else
 			return error( res.error() );
 	}
-	
+
 	@Override
 	public Result<Void> deleteAllShorts(String userId, String password, String token) {
-		Log.info(() -> format("deleteAllShorts : userId = %s, password = %s, token = %s\n", userId, password, token));
+//		Log.info(() -> format("deleteAllShorts : userId = %s, password = %s, token = %s\n", userId, password, token));
+//
+//		if (!Token.isValid(token, userId))
+//			return error(FORBIDDEN);
+//
+//		if (DB_MODE.equalsIgnoreCase("post")) {
+//
+//			return DB.transaction((hibernate) -> {
+//
+//				// Delete shorts
+//				var query1 = format("DELETE Short s WHERE s.ownerId = '%s'", userId);
+//				hibernate.createQuery(query1, Short.class).executeUpdate();
+//
+//				// Delete follows
+//				var query2 = format("DELETE Following f WHERE f.follower = '%s' OR f.followee = '%s'", userId, userId);
+//				hibernate.createQuery(query2, Following.class).executeUpdate();
+//
+//				// Delete likes
+//				var query3 = format("DELETE Likes l WHERE l.ownerId = '%s' OR l.userId = '%s'", userId, userId);
+//				hibernate.createQuery(query3, Likes.class).executeUpdate();
+//
+//				return Result.ok();
+//			});
+//		} else if (DB_MODE.equalsIgnoreCase("cosmos")) {
+//
+//
+//			try {
+//				// Delete shorts from the Cosmos DB
+//				initShorts();
+//				String shortQuery = "SELECT s.shortId FROM Short s WHERE s.ownerId = @userId";
+//				FeedResponse<ShortDAO> shortItems = shorts.queryItems(shortQuery, new CosmosQueryRequestOptions().setQueryParameters(new SqlParameter("@userId", userId)), ShortDAO.class);
+//				for (ShortDAO shortItem : shortItems) {
+//					shorts.deleteItem(shortItem.getId(), new PartitionKey(shortItem.getId()), new CosmosItemRequestOptions());
+//					Log.info(() -> format("Deleted Short: %s", shortItem.getId()));
+//				}
+//
+//				// Delete following from Cosmos DB
+//				initFollowing();
+//				String followingQuery = "SELECT f.id FROM Following f WHERE f.follower = @userId OR f.followee = @userId";
+//				FeedResponse<FollowingDAO> followingItems = following.queryItems(followingQuery, new CosmosQueryRequestOptions().setQueryParameters(new SqlParameter("@userId", userId)), FollowingDAO.class);
+//				for (FollowingDAO followingItem : followingItems) {
+//					following.deleteItem(followingItem.getId(), new PartitionKey(followingItem.getId()), new CosmosItemRequestOptions());
+//					Log.info(() -> format("Deleted Following: %s", followingItem.getId()));
+//				}
+//
+//				// Delete likes from Cosmos DB
+//				initLikes();
+//				String likesQuery = "SELECT l.id FROM Likes l WHERE l.ownerId = @userId OR l.userId = @userId";
+//				FeedResponse<LikesDAO> likeItems = likes.queryItems(likesQuery, new CosmosQueryRequestOptions().setQueryParameters(new SqlParameter("@userId", userId)), LikesDAO.class);
+//				for (LikesDAO likeItem : likeItems) {
+//					likes.deleteItem(likeItem.getId(), new PartitionKey(likeItem.getId()), new CosmosItemRequestOptions());
+//					Log.info(() -> format("Deleted Like: %s", likeItem.getId()));
+//				}
+//
+//				return Result.ok();
+//			} catch (CosmosException e) {
+//				Log.severe(() -> "Error deleting items: " + e.getMessage());
+//				return Result.error(Result.ErrorCode.INTERNAL_ERROR);
+//			}
+//		} else {
+//			return Result.error(Result.ErrorCode.INTERNAL_ERROR); // Handle invalid DB mode
+//		}
+		return ok();}
 
-		if( ! Token.isValid( token, userId ) )
-			return error(FORBIDDEN);
-		
-		return DB.transaction( (hibernate) -> {
-						
-			//delete shorts
-			var query1 = format("DELETE Short s WHERE s.ownerId = '%s'", userId);		
-			hibernate.createQuery(query1, Short.class).executeUpdate();
-			
-			//delete follows
-			var query2 = format("DELETE Following f WHERE f.follower = '%s' OR f.followee = '%s'", userId, userId);		
-			hibernate.createQuery(query2, Following.class).executeUpdate();
-			
-			//delete likes
-			var query3 = format("DELETE Likes l WHERE l.ownerId = '%s' OR l.userId = '%s'", userId, userId);		
-			hibernate.createQuery(query3, Likes.class).executeUpdate();
-			
-		});
-	}
 	private static byte[] randomBytes(int size) {
 		var r = new Random(1L);
 

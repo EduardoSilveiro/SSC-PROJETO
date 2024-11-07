@@ -243,13 +243,15 @@ public class JavaUsers implements Users {
 	  if (badUpdateUserInfo(userId, pwd, other)) {
 		  return error(BAD_REQUEST);
 	  }
-	  Map<String,UserDAO> userMap = getFromCache(userId,pwd);
-
 
 	  if(DB_MODE.equalsIgnoreCase("post")){
 
-		  if (userMap != null) {
- 			User postUser =  userMap.get("users:" + userId);
+		  if (CACHE_MODE) {
+			  var key = "users:" + userId;
+			  var value = cache.getValue(key, UserDAO.class);
+			  Log.info(() -> format("getFromCache : " + value));
+			  User  postUser = new User(value.getUserId(), value.getPwd(), value.getEmail(), value.getDisplayName());
+
 			  cache.setValue("users:" + userId, postUser.updateFrom(other));
 			  Log.info("Cache data is completed for NO SQL: " + user);
 
@@ -262,14 +264,19 @@ public class JavaUsers implements Users {
 
 		  // Initialize Cosmos client if needed
 		  init();
- 			if (user != null) {
+		  if (CACHE_MODE) {
+			  var key = "users:" + userId;
+			  var value = cache.getValue(key, UserDAO.class);
+			  Log.info(() -> format("getFromCache : " + value));
+			  User  postUser = new User(value.getUserId(), value.getPwd(), value.getEmail(), value.getDisplayName());
+
+			  cache.setValue("users:" + userId, postUser.updateFrom(other));
+			  Log.info("Cache data is completed for NO SQL: " + user);
 
 			  UserDAO newUserDAO = new UserDAO(other);
 
 			  CosmosItemResponse<UserDAO> updatedResponse = users.replaceItem(newUserDAO, userId, new PartitionKey(userId), new CosmosItemRequestOptions());
-			  User postUser =  userMap.get("users:" + userId);
-			  cache.setValue("users:" + userId, postUser.updateFrom(other));
-			  Log.info("Cache data is completed for NO SQL: " + user);
+
 			  return Result.ok(other);
 
 		  }

@@ -1,8 +1,6 @@
 C:\Users\dalia\OneDrive\Documentos\GitHub\SSC-PROJETO\scc2425-tukano\src\main\java\tukano\api\rest\RestUsers.java
 C:\Users\dalia\OneDrive\Documentos\GitHub\SSC-PROJETO\scc2425-tukano\src\main\java\tukano\impl\rest\RestResource.java
 C:\Users\dalia\OneDrive\Documentos\GitHub\SSC-PROJETO\scc2425-tukano\src\main\java\tukano\impl\data\LikesDAO.java
-C:\Users\dalia\OneDrive\Documentos\GitHub\SSC-PROJETO\scc2425-tukano\src\main\java\tukano\api\FeedDAO.java
-C:\Users\dalia\OneDrive\Documentos\GitHub\SSC-PROJETO\scc2425-tukano\src\main\java\tukano\api\Feed.java
 C:\Users\dalia\OneDrive\Documentos\GitHub\SSC-PROJETO\scc2425-tukano\src\main\java\utils\Constants.java
 C:\Users\dalia\OneDrive\Documentos\GitHub\SSC-PROJETO\scc2425-tukano\src\main\java\utils\JSON.java
 C:\Users\dalia\OneDrive\Documentos\GitHub\SSC-PROJETO\scc2425-tukano\src\main\java\tukano\api\UserDAO.java
@@ -50,4 +48,3 @@ C:\Users\dalia\OneDrive\Documentos\GitHub\SSC-PROJETO\scc2425-tukano\src\main\ja
 C:\Users\dalia\OneDrive\Documentos\GitHub\SSC-PROJETO\scc2425-tukano\src\main\java\tukano\impl\data\Likes.java
 C:\Users\dalia\OneDrive\Documentos\GitHub\SSC-PROJETO\scc2425-tukano\src\main\java\tukano\api\azure\UserDBLayer.java
 C:\Users\dalia\OneDrive\Documentos\GitHub\SSC-PROJETO\scc2425-tukano\src\main\java\tukano\api\rest\RestShorts.java
-C:\Users\dalia\OneDrive\Documentos\GitHub\SSC-PROJETO\scc2425-tukano\src\main\java\tukano\impl\srv\UserResource.java

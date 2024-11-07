@@ -31,7 +31,7 @@ scenarios:
           headers:
             Content-Type: application/json
           json:
-            userId: "TesteCriar"
+            userId: "TesteCriar1"
             pwd: "newpassword"
             email: "UpdatedUser@gmail.com"
             displayName: "NewDisplayName"
@@ -43,10 +43,10 @@ scenarios:
             Content-Type: application/json
 
 
-#      # 5. Excluir User (DELETE /users/{userId}) DONE
-#      - delete:
-#          url: /users/TesteCriar1?pwd=password
-#          headers:
-#            Content-Type: application/json
+      # 5. Excluir User (DELETE /users/{userId}) DONE
+      - delete:
+          url: /users/TesteCriar1?pwd=password
+          headers:
+            Content-Type: application/json
 
 

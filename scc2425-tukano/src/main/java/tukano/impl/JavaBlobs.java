@@ -26,7 +26,7 @@ public class JavaBlobs implements Blobs {
 
 	private static Blobs instance;
 	private static Logger Log = Logger.getLogger(JavaBlobs.class.getName());
-	static String storageConnectionString = "DefaultEndpointsProtocol=https;AccountName=scc242555806;AccountKey=IgxfusKPp9A582bM4UjUNkMXULHtWC1n6FZ5RV7HRdv4La35sC0vk4wyWJbEtxaNpdT5EoMrMTFq+ASt9H5ZGQ==;EndpointSuffix=core.windows.net";
+	static String storageConnectionString = "DefaultEndpointsProtocol=https;AccountName=tukanoblobs;AccountKey=t/vJrseyyTQVU0k6x/+VBAvThsdBHotCIFTvgXSFYJ95bmNi3vaIHWj/D6/WPMiA8rVlwb8QG+Tz+AStbsOFkQ==;EndpointSuffix=core.windows.net";
 	public String baseURI;
 	private BlobStorage storage;
 	private BlobContainerClient blobs;

@@ -60,7 +60,7 @@ public class ShortDAO extends Short {
     }
     public ShortDAO copyWithLikes_And_Token( long totLikes) {
         var urlWithToken = String.format("%s?token=%s", blobUrl, Token.get(blobUrl));
-        System.out.println(urlWithToken);
+
         return new ShortDAO( shortId, ownerId, urlWithToken, timestamp, (int)totLikes);
     }
 }

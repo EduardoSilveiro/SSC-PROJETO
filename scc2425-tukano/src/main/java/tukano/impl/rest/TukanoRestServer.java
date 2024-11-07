@@ -1,4 +1,4 @@
-/**
+
 package tukano.impl.rest;
 
 import java.net.URI;
@@ -40,7 +40,7 @@ public class TukanoRestServer extends Application {
 		resources.add(RestUsersResource.class);
 		resources.add(RestShortsResource.class);
 		Props.load("azurekeys-region.props"); //place the props file in resources folder under java/main
-
+		serverURI = String.format(SERVER_BASE_URI, IP.hostname(), PORT);
 
 	}
 
@@ -57,12 +57,12 @@ public class TukanoRestServer extends Application {
 
 
 	public static void main(String[] args) throws Exception {
-		//Args.use(args);
+		Args.use(args);
 
-		//Token.setSecret( Args.valueOf("-secret", ""));
-		//Props.load( Args.valueOf("-props", "").split(","));
+		Token.setSecret( Args.valueOf("-secret", ""));
+		Props.load( Args.valueOf("-props", "").split(","));
 
-		//new TukanoRestServer().start();
+		new TukanoRestServer().start();
 		return;
 	}
 
@@ -77,7 +77,7 @@ public class TukanoRestServer extends Application {
 	}
 }
 
-**/
+/**
 package tukano.impl.rest;
 
  import java.net.URI;
@@ -134,3 +134,5 @@ package tukano.impl.rest;
  new TukanoRestServer().start();
  }
  }
+
+ **/

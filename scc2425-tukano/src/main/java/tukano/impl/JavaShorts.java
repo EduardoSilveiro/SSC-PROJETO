@@ -47,14 +47,14 @@ import utils.Hash;
 public class JavaShorts implements Shorts {
 
 	private static Logger Log = Logger.getLogger(JavaShorts.class.getName());
-	private static final String CONNECTION_URL = Constants.tomasConst.getDbUrl();
-	private static final String DB_KEY = Constants.tomasConst.getDbKey();
-	private static final String DB_NAME = Constants.tomasConst.getDbName();
+	private static final String CONNECTION_URL = Constants.eduardoConst.getDbUrl();
+	private static final String DB_KEY = Constants.eduardoConst.getDbKey();
+	private static final String DB_NAME = Constants.eduardoConst.getDbName();
 	private static Shorts instance;
 	private static RedisCache cache = RedisCache.getInstance(); // Cache instance
-	public static boolean CACHE_MODE = Constants.tomasConst.isCacheActive();
+	public static boolean CACHE_MODE = Constants.eduardoConst.isCacheActive();
 
-	public static String DB_MODE = Constants.tomasConst.getDbMode();
+	public static String DB_MODE = Constants.eduardoConst.getDbMode();
 
 	synchronized public static Shorts getInstance() {
 		if (instance != null)
@@ -490,24 +490,26 @@ public class JavaShorts implements Shorts {
 	}
 
 
+	/**
+	 * Nao fomos capazes de colocar esta funcáo a funcionar, como tal preferimos deixa la comentanda para nao
+	 * haver risco de atrapalhar o bom funcionamento do resto do projeto
+	 * @param userId user of the requested feed
+	 * @param password the password of the user
+	 * @return
+	 */
 	@Override
 	public Result<List<String>> getFeed(String userId, String password) {
 //		Log.info(() -> format("getFeed : userId = %s, pwd = %s\n", userId, password));
 //
-//		// Check if we are in 'Post' mode or 'Cosmos' mode
 //		if (DB_MODE.equalsIgnoreCase("post")) {
-//			// Use DB.sql to fetch the user's posts (shorts where ownerId = userId)
 //			final var SHORT_QUERY = "SELECT s.shortId, s.timestamp FROM Short s WHERE s.ownerId = :userId";
 //			List<Object[]> userPosts = DB.sql(SHORT_QUERY, Object[].class, userId);
 //
-//			// Use DB.sql to fetch the followees for the user
 //			final var FOLLOW_QUERY = "SELECT f.followee FROM Following f WHERE f.follower = :userId";
 //			List<String> followees = DB.sql(FOLLOW_QUERY, String.class, userId);
 //
-//			// Collect posts from followees
 //			List<Tuple<String, Long>> resultTuples = new ArrayList<>();
 //			for (String followee : followees) {
-//				// Query followee posts (shorts where ownerId = followee)
 //				String followeeQuery = "SELECT s.shortId, s.timestamp FROM Short s WHERE s.ownerId = :followee";
 //				List<Object[]> followeePosts = DB.sql(followeeQuery, Object[].class, followee);
 //				for (Object[] post : followeePosts) {
@@ -515,15 +517,12 @@ public class JavaShorts implements Shorts {
 //				}
 //			}
 //
-//			// Add the user's own posts to the result
 //			for (Object[] post : userPosts) {
 //				resultTuples.add(new Tuple<>((String) post[0], (Long) post[1]));
 //			}
 //
-//			// Sort all posts by timestamp in descending order
 //			resultTuples.sort((t1, t2) -> Long.compare(t2.getT2(), t1.getT2()));
 //
-//			// Extract sorted shortIds into a result list
 //			List<String> result = resultTuples.stream()
 //					.map(Tuple::getT1)
 //					.collect(Collectors.toList());
@@ -531,29 +530,22 @@ public class JavaShorts implements Shorts {
 //			return Result.ok(result);
 //		}
 //
-//		// Case for 'Cosmos' mode (assuming it is not implemented with Hibernate)
 //		try {
-//			// Use Hibernate to fetch the posts of the user (similar to 'post' mode)
 //			String userShortQuery = "SELECT s.shortId, s.timestamp FROM Short s WHERE s.ownerId = :userId";
 //			List<Object[]> userPosts = DB.sql(userShortQuery, Object[].class, userId);
 //
-//			// Fetch the users the user is following
 //			String followeeQuery = "SELECT f.followee FROM Following f WHERE f.follower = :userId";
 //			List<String> followeesResponse = DB.sql(followeeQuery, String.class, userId);
 //
-//			// Collect followees from the query
 //			List<String> followees = followeesResponse.stream()
 //					.collect(Collectors.toList());
 //
-//			// List to hold all posts
 //			List<Tuple<String, Long>> resultTuples = new ArrayList<>();
 //
-//			// Add the user's own posts to the list
 //			for (Object[] post : userPosts) {
 //				resultTuples.add(new Tuple<>((String) post[0], (Long) post[1]));
 //			}
 //
-//			// Add the posts from each followee to the list
 //			for (String followee : followees) {
 //				String followeePostQuery = "SELECT s.shortId, s.timestamp FROM Short s WHERE s.ownerId = :ownerId";
 //				List<Object[]> followeePosts = DB.sql(followeePostQuery, Object[].class, followee);
@@ -562,10 +554,8 @@ public class JavaShorts implements Shorts {
 //				}
 //			}
 //
-//			// Sort all posts by timestamp in descending order
 //			resultTuples.sort((t1, t2) -> Long.compare(t2.getT2(), t1.getT2()));
 //
-//			// Extract shortIds into a result list
 //			List<String> result = resultTuples.stream()
 //					.map(Tuple::getT1)
 //					.collect(Collectors.toList());
@@ -594,6 +584,15 @@ public class JavaShorts implements Shorts {
 			return error( res.error() );
 	}
 
+
+	/**
+	 * Nao fomos capazes de colocar esta funcáo a funcionar, como tal preferimos deixa la comentanda para nao
+	 * haver risco de atrapalhar o bom funcionamento do resto do projeto
+	 * @param userId
+	 * @param password
+	 * @param token
+	 * @return
+	 */
 	@Override
 	public Result<Void> deleteAllShorts(String userId, String password, String token) {
 //		Log.info(() -> format("deleteAllShorts : userId = %s, password = %s, token = %s\n", userId, password, token));
@@ -605,15 +604,12 @@ public class JavaShorts implements Shorts {
 //
 //			return DB.transaction((hibernate) -> {
 //
-//				// Delete shorts
 //				var query1 = format("DELETE Short s WHERE s.ownerId = '%s'", userId);
 //				hibernate.createQuery(query1, Short.class).executeUpdate();
 //
-//				// Delete follows
 //				var query2 = format("DELETE Following f WHERE f.follower = '%s' OR f.followee = '%s'", userId, userId);
 //				hibernate.createQuery(query2, Following.class).executeUpdate();
 //
-//				// Delete likes
 //				var query3 = format("DELETE Likes l WHERE l.ownerId = '%s' OR l.userId = '%s'", userId, userId);
 //				hibernate.createQuery(query3, Likes.class).executeUpdate();
 //
@@ -623,7 +619,6 @@ public class JavaShorts implements Shorts {
 //
 //
 //			try {
-//				// Delete shorts from the Cosmos DB
 //				initShorts();
 //				String shortQuery = "SELECT s.shortId FROM Short s WHERE s.ownerId = @userId";
 //				FeedResponse<ShortDAO> shortItems = shorts.queryItems(shortQuery, new CosmosQueryRequestOptions().setQueryParameters(new SqlParameter("@userId", userId)), ShortDAO.class);
@@ -632,7 +627,6 @@ public class JavaShorts implements Shorts {
 //					Log.info(() -> format("Deleted Short: %s", shortItem.getId()));
 //				}
 //
-//				// Delete following from Cosmos DB
 //				initFollowing();
 //				String followingQuery = "SELECT f.id FROM Following f WHERE f.follower = @userId OR f.followee = @userId";
 //				FeedResponse<FollowingDAO> followingItems = following.queryItems(followingQuery, new CosmosQueryRequestOptions().setQueryParameters(new SqlParameter("@userId", userId)), FollowingDAO.class);
@@ -641,7 +635,6 @@ public class JavaShorts implements Shorts {
 //					Log.info(() -> format("Deleted Following: %s", followingItem.getId()));
 //				}
 //
-//				// Delete likes from Cosmos DB
 //				initLikes();
 //				String likesQuery = "SELECT l.id FROM Likes l WHERE l.ownerId = @userId OR l.userId = @userId";
 //				FeedResponse<LikesDAO> likeItems = likes.queryItems(likesQuery, new CosmosQueryRequestOptions().setQueryParameters(new SqlParameter("@userId", userId)), LikesDAO.class);

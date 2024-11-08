@@ -1,6 +1,6 @@
 # Date : 10/14/24, 10:16 AM
-BlobStoreConnection=DefaultEndpointsProtocol=https;AccountName=scc242555806;AccountKey=IgxfusKPp9A582bM4UjUNkMXULHtWC1n6FZ5RV7HRdv4La35sC0vk4wyWJbEtxaNpdT5EoMrMTFq+ASt9H5ZGQ==;EndpointSuffix=core.windows.net
-COSMOSDB_KEY=RguYNsPW3CmoCZQ8vVT8uUF2d6cHycxrk7Pq3ys3ARhx77X9WYYn93vctmqKy9MRedLaJaYziLNTACDbsO7SrA==
-COSMOSDB_URL=https://scc2324204.documents.azure.com:443/
-COSMOSDB_DATABASE=scc2425
+BlobStoreConnection=DefaultEndpointsProtocol=https;AccountName=tukanoblobs;AccountKey=t/vJrseyyTQVU0k6x/+VBAvThsdBHotCIFTvgXSFYJ95bmNi3vaIHWj/D6/WPMiA8rVlwb8QG+Tz+AStbsOFkQ==;EndpointSuffix=core.windows.net
+COSMOSDB_KEY=6ulvzuHDBQgk09jceF0n5jtApjYKwJWY07RHYtJOelaZvdDj2niTMewPaG9Q4qe66Re0RTEe64yJACDbaKwEIg==
+COSMOSDB_URL=https://tukanocosmos72287.documents.azure.com:443/
+COSMOSDB_DATABASE=scc2324
 

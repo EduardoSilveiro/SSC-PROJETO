@@ -7,13 +7,13 @@
     <list default="true" id="3c442bf9-271c-4bdd-b717-b59d56f8b66c" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/hibernate.cfg.xml" beforeDir="false" afterPath="$PROJECT_DIR$/hibernate.cfg.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tukano/impl/JavaBlobs.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tukano/impl/JavaBlobs.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/tukano/impl/JavaShorts.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tukano/impl/JavaShorts.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/tukano/impl/JavaUsers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tukano/impl/JavaUsers.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tukano/impl/rest/TukanoRestServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tukano/impl/rest/TukanoRestServer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/utils/Constants.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/utils/Constants.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/azurekeys-region.props" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/azurekeys-region.props" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/classes/azurekeys-region.props" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/classes/azurekeys-region.props" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/classes/hibernate.cfg.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/classes/hibernate.cfg.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/tests/test-shorts.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/tests/test-shorts.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/test/Test.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/test/Test.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/tukano/api/ErrorResult.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/api/ErrorResult.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/tukano/api/OkResult.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/api/OkResult.class" afterDir="false" />
@@ -35,7 +35,6 @@
       <change beforePath="$PROJECT_DIR$/target/classes/tukano/impl/JavaUsers.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/impl/JavaUsers.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/tukano/impl/data/Following.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/impl/data/Following.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/tukano/impl/data/Likes.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/impl/data/Likes.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/tukano/impl/rest/TukanoRestServer.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/impl/rest/TukanoRestServer.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/tukano/impl/rest/utils/CustomLoggingFilter.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/impl/rest/utils/CustomLoggingFilter.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/tukano/impl/storage/FilesystemStorage.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/tukano/impl/storage/FilesystemStorage.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/utils/Args.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/utils/Args.class" afterDir="false" />
@@ -46,9 +45,7 @@
       <change beforePath="$PROJECT_DIR$/target/classes/utils/Props.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/utils/Props.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
     </list>
-    <list id="5e6b6627-f8e5-46a8-b838-e201a24495fc" name="Changes by tomas" comment="">
-      <change beforePath="$PROJECT_DIR$/src/main/java/tukano/impl/JavaUsers.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tukano/impl/JavaUsers.java" afterDir="false" />
-    </list>
+    <list id="5e6b6627-f8e5-46a8-b838-e201a24495fc" name="Changes by tomas" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -67,18 +64,6 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="jar://$PROJECT_DIR$/../../../../../../../Program Files/Java/jdk-23/lib/src.zip!/java.base/java/net/URI.java" root0="SKIP_INSPECTION" />
   </component>
-  <component name="LineStatusTrackerManager">
-    <file path="$PROJECT_DIR$/src/main/java/tukano/impl/JavaUsers.java">
-      <ranges>
-        <range start1="38" end1="41" start2="38" end2="41" changelist="3c442bf9-271c-4bdd-b717-b59d56f8b66c" />
-        <range start1="102" end1="102" start2="102" end2="108" changelist="5e6b6627-f8e5-46a8-b838-e201a24495fc" />
-        <range start1="103" end1="103" start2="109" end2="143" changelist="5e6b6627-f8e5-46a8-b838-e201a24495fc" />
-        <range start1="107" end1="111" start2="147" end2="152" changelist="3c442bf9-271c-4bdd-b717-b59d56f8b66c" />
-        <range start1="113" end1="114" start2="154" end2="155" changelist="3c442bf9-271c-4bdd-b717-b59d56f8b66c" />
-        <range start1="121" end1="122" start2="162" end2="163" changelist="3c442bf9-271c-4bdd-b717-b59d56f8b66c" />
-      </ranges>
-    </file>
-  </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
@@ -95,17 +80,17 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "last_opened_file_path": "C:/Users/dalia/OneDrive/Documentos/GitHub/SSC-PROJETO/scc2425-tukano/src/main/webapp/WEB-INF/classes",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.0",
-    "settings.editor.selected.configurable": "reference.settingsdialog.IDE.editor.colors"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/dalia/OneDrive/Documentos/GitHub/SSC-PROJETO/scc2425-tukano/src/main/webapp/WEB-INF/classes&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.IDE.editor.colors&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\dalia\OneDrive\Documentos\GitHub\SSC-PROJETO\scc2425-tukano\src\main\webapp\WEB-INF\classes" />

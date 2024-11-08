@@ -47,9 +47,9 @@ import utils.Hash;
 public class JavaShorts implements Shorts {
 
 	private static Logger Log = Logger.getLogger(JavaShorts.class.getName());
-	private static final String CONNECTION_URL = Constants.tomasConst.getDbUrl();
-	private static final String DB_KEY = Constants.tomasConst.getDbKey();
-	private static final String DB_NAME = Constants.tomasConst.getDbName();
+	private static final String CONNECTION_URL = Constants.eduardoConst.getDbUrl();
+	private static final String DB_KEY = Constants.eduardoConst.getDbKey();
+	private static final String DB_NAME = Constants.eduardoConst.getDbName();
 	private static Shorts instance;
 	private static RedisCache cache = RedisCache.getInstance(); // Cache instance
 	public static boolean CACHE_MODE = Constants.eduardoConst.isCacheActive();

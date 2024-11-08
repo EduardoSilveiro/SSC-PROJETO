@@ -3,7 +3,7 @@ package utils;
 public enum Constants {
     eduardoConst("https://tukanocosmos72287.documents.azure.com:443/",
             "6ulvzuHDBQgk09jceF0n5jtApjYKwJWY07RHYtJOelaZvdDj2niTMewPaG9Q4qe66Re0RTEe64yJACDbaKwEIg==", "scc2324",
-            "tukano-1728841944172.redis.cache.windows.net", "NMd5anwTl0mX4gRzgR6hfF0ytls6EztfpAzCaPUMlAs=","",false),
+            "sc2425cache72287.redis.cache.windows.net", "ksIzhL3Dvc0wLiOgfoZaLQEqI7R0t5m3lAzCaEtFzL8=","post",false),
     tomasConst("https://scc2324204.documents.azure.com:443/",
             "RguYNsPW3CmoCZQ8vVT8uUF2d6cHycxrk7Pq3ys3ARhx77X9WYYn93vctmqKy9MRedLaJaYziLNTACDbsO7SrA==", "scc2425", null,
             null,"post",true),

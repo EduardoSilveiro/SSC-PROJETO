@@ -36,9 +36,9 @@ import utils.JSON;
 public class JavaUsers implements Users {
 
 	private static Logger Log = Logger.getLogger(JavaUsers.class.getName());
-	private static final String CONNECTION_URL = Constants.tomasConst.getDbUrl();
-	private static final String DB_KEY = Constants.tomasConst.getDbKey();
-	private static final String DB_NAME = Constants.tomasConst.getDbName();
+	private static final String CONNECTION_URL = Constants.eduardoConst.getDbUrl();
+	private static final String DB_KEY = Constants.eduardoConst.getDbKey();
+	private static final String DB_NAME = Constants.eduardoConst.getDbName();
 	private static Users instance;
 
 	private CosmosClient client;
@@ -100,18 +100,59 @@ public class JavaUsers implements Users {
 		users = client.getDatabase(DB_NAME).getContainer("users");
 
 	}
+	public boolean userExists(String userId) {
+		Log.info(() -> format("Checking existence of user: userId = %s", userId));
 
+		if (userId == null) {
+			return false; // If userId is null, user cannot exist
+		}
+
+		// Check in cache if CACHE_MODE is enabled
+		if (CACHE_MODE) {
+			var key = "users:" + userId;
+			var value = cache.getValue(key, UserDAO.class);
+			if (value != null) {
+				Log.info(() -> format("User found in cache: userId = %s", userId));
+				return true;
+			}
+			Log.info(() -> format("User not found in cache: userId = %s", userId));
+		}
+
+		try {
+			if (DB_MODE.equalsIgnoreCase("post")) {
+				var userResult = DB.getOne(userId, User.class);
+				return userResult != null && userResult.isOK();
+			} else {
+				init();
+				CosmosItemResponse<UserDAO> response = users.readItem(userId, new PartitionKey(userId), UserDAO.class);
+				UserDAO userDAO = response.getItem();
+				if (userDAO != null) {
+					Log.info(() -> format("User found in Cosmos DB: userId = %s", userId));
+					return true;
+				}
+			}
+		} catch (CosmosException e) {
+			Log.info(() -> format("User not found in Cosmos DB or error occurred: %s", e.getMessage()));
+		} catch (Exception e) {
+			Log.info(() -> format("Unexpected error when checking user existence: %s", e.getMessage()));
+		}
+
+		// If not found in cache, database, or Cosmos DB, user does not exist
+		Log.info(() -> format("User does not exist: userId = %s", userId));
+		return false;
+	}
 	@Override
 	public Result<String> createUser(User user) {
 		Log.info(() -> format("createUser : %s\n", user));
 
-		if (user.getUserId() == null || user.getPwd() == null || user.getEmail() == null || user.getDisplayName() == null) {
-			Log.info("User data is incomplete: " + user);
-			return Result.error(Result.ErrorCode.CONFLICT);
-		}
+//		if (userExists(user.getUserId())) {
+//			Log.info("User data is incomplete: " + user);
+//			return Result.error(Result.ErrorCode.CONFLICT);
+//		}
+
 
 		if (DB_MODE.equalsIgnoreCase("post")) {
-			errorOrValue(DB.insertOne(user), user.getId());
+
 			if (CACHE_MODE) {
 				UserDAO userDAO = new UserDAO(user);
 				var key1 = "users:" + userDAO.getId();
@@ -119,7 +160,7 @@ public class JavaUsers implements Users {
 				cache.setValue(key1, userDAO);
 				Log.info("Cache data is completed for POSTESQL: " + user);
 			}
-			return Result.ok(user.getId());
+			return errorOrValue(DB.insertOne(user), user.getId());
 		} else {
 			try {
 				init();

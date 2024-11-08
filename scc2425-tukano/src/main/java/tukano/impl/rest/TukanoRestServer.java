@@ -62,8 +62,8 @@ public class TukanoRestServer extends Application {
 		//Token.setSecret( Args.valueOf("-secret", ""));
 		//Props.load( Args.valueOf("-props", "").split(","));
 
-		new TukanoRestServer().start();
-
+		//new TukanoRestServer().start();
+		return;
 	}
 
 	@Override

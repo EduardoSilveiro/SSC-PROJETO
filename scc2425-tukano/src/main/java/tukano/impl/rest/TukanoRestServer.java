@@ -39,8 +39,8 @@ public class TukanoRestServer extends Application {
 		resources.add(RestBlobsResource.class);
 		resources.add(RestUsersResource.class);
 		resources.add(RestShortsResource.class);
-		Props.load("azurekeys-region.props"); //place the props file in resources folder under java/main
-		serverURI = String.format(SERVER_BASE_URI, IP.hostname(), PORT);
+ 		Props.load("azurekeys-region.props"); //place the props file in resources folder under java/main
+		//serverURI = String.format(SERVER_BASE_URI, IP.hostname(), PORT);
 
 	}
 
@@ -49,7 +49,7 @@ public class TukanoRestServer extends Application {
 	protected void start() throws Exception {
 
 	 ResourceConfig config = new ResourceConfig();
-
+		config.register(new JacksonFeature());
 		JdkHttpServerFactory.createHttpServer( URI.create(serverURI.replace(IP.hostname(), INETADDR_ANY)), config);
 
 		Log.info(String.format("Tukano Server ready @ %s\n",  serverURI));
@@ -62,7 +62,7 @@ public class TukanoRestServer extends Application {
 		//Token.setSecret( Args.valueOf("-secret", ""));
 		//Props.load( Args.valueOf("-props", "").split(","));
 
-		//new TukanoRestServer().start();
+		new TukanoRestServer().start();
 		return;
 	}
 

@@ -26,7 +26,7 @@ public class JavaBlobs implements Blobs {
 
 	private static Blobs instance;
 	private static Logger Log = Logger.getLogger(JavaBlobs.class.getName());
-	static String storageConnectionString = "DefaultEndpointsProtocol=https;AccountName=tukanoblobs;AccountKey=t/vJrseyyTQVU0k6x/+VBAvThsdBHotCIFTvgXSFYJ95bmNi3vaIHWj/D6/WPMiA8rVlwb8QG+Tz+AStbsOFkQ==;EndpointSuffix=core.windows.net";
+	static String storageConnectionString = "DefaultEndpointsProtocol=https;AccountName=scc242555806;AccountKey=IgxfusKPp9A582bM4UjUNkMXULHtWC1n6FZ5RV7HRdv4La35sC0vk4wyWJbEtxaNpdT5EoMrMTFq+ASt9H5ZGQ==;EndpointSuffix=core.windows.net";
 	public String baseURI;
 	private BlobStorage storage;
 	private BlobContainerClient blobs;
@@ -47,8 +47,7 @@ public class JavaBlobs implements Blobs {
 		this.blobs = blobs;
 	}
 
-	//A ADICIONAR TOKEN, BASICAMENTE CHAMAR O JAVASHORTS INSTANCE, IR VERIFICAR O BLOBID E RETIRAR O TIME STAMP, DEPOIS USAR A CLASS
-	//TOKEN PARA VERIFICAR SE É VALIDO, ESTE TOKEN É DADO QD CRIAMOS UM SHORT PELO METODO copyWithLikes_And_Token(long totLikes)
+
 	@Override
 	public Result<Void> upload(String blobId, byte[] bytes, String token) {
 		Log.info(() -> format("upload : blobId = %s, sha256 = %s, token = %s\n", blobId, Hex.of(Hash.sha256(bytes)), token));
@@ -79,7 +78,7 @@ public class JavaBlobs implements Blobs {
 		boolean isDeleted = blob.deleteIfExists();
 		return Result.ok(null);
 	}
-	//NEEDS TO GET ALL SHORTS OF A USER THEN SAVE ITS BLOBS URLS TO A LIST THEN DELETE BLOBS IN THE LIST FROM BLOB STORAGE AZURE
+
 	@Override
 	public Result<Void> deleteAllBlobs(String userId, String token) {
 		Log.info(() -> format("deleteAllBlobs : userId = %s, token=%s\n", userId, token));

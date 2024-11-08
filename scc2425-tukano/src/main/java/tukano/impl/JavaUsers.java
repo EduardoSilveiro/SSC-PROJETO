@@ -36,9 +36,9 @@ import utils.JSON;
 public class JavaUsers implements Users {
 
 	private static Logger Log = Logger.getLogger(JavaUsers.class.getName());
-	private static final String CONNECTION_URL = Constants.eduardoConst.getDbUrl();
-	private static final String DB_KEY = Constants.eduardoConst.getDbKey();
-	private static final String DB_NAME = Constants.eduardoConst.getDbName();
+	private static final String CONNECTION_URL = Constants.tomasConst.getDbUrl();
+	private static final String DB_KEY = Constants.tomasConst.getDbKey();
+	private static final String DB_NAME = Constants.tomasConst.getDbName();
 	private static Users instance;
 
 	private CosmosClient client;
@@ -47,8 +47,8 @@ public class JavaUsers implements Users {
 	private CosmosContainer feeds;
 	static RedisCache cache = RedisCache.getInstance();
 
-	public static String DB_MODE = Constants.eduardoConst.getDbMode();
-	public static boolean CACHE_MODE = Constants.eduardoConst.isCacheActive();
+	public static String DB_MODE = Constants.tomasConst.getDbMode();
+	public static boolean CACHE_MODE = Constants.tomasConst.isCacheActive();
 
 	public static synchronized Users getInstance() {
 
@@ -145,10 +145,10 @@ public class JavaUsers implements Users {
 	public Result<String> createUser(User user) {
 		Log.info(() -> format("createUser : %s\n", user));
 
-//		if (userExists(user.getUserId())) {
-//			Log.info("User data is incomplete: " + user);
-//			return Result.error(Result.ErrorCode.CONFLICT);
-//		}
+		if (userExists(user.getUserId())) {
+			Log.info("User data is incomplete: " + user);
+			return Result.error(Result.ErrorCode.CONFLICT);
+		}
 
 
 		if (DB_MODE.equalsIgnoreCase("post")) {
@@ -160,7 +160,8 @@ public class JavaUsers implements Users {
 				cache.setValue(key1, userDAO);
 				Log.info("Cache data is completed for POSTESQL: " + user);
 			}
-			return errorOrValue(DB.insertOne(user), user.getId());
+			 DB.insertOne(user)  ;
+			return Result.ok( user.getId());
 		} else {
 			try {
 				init();

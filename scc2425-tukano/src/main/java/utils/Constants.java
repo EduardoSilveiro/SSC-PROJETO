@@ -6,7 +6,7 @@ public enum Constants {
             "sc2425cache72287.redis.cache.windows.net", "ksIzhL3Dvc0wLiOgfoZaLQEqI7R0t5m3lAzCaEtFzL8=","post",false),
     tomasConst("https://scc2324204.documents.azure.com:443/",
             "RguYNsPW3CmoCZQ8vVT8uUF2d6cHycxrk7Pq3ys3ARhx77X9WYYn93vctmqKy9MRedLaJaYziLNTACDbsO7SrA==", "scc2425", null,
-            null,"post",true),
+            null,"post",false),
 
     deletedUser(null, null, "DeletedUser", null, null,null,false);
 

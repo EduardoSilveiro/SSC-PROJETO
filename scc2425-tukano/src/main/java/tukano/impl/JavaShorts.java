@@ -47,14 +47,14 @@ import utils.Hash;
 public class JavaShorts implements Shorts {
 
 	private static Logger Log = Logger.getLogger(JavaShorts.class.getName());
-	private static final String CONNECTION_URL = Constants.eduardoConst.getDbUrl();
-	private static final String DB_KEY = Constants.eduardoConst.getDbKey();
-	private static final String DB_NAME = Constants.eduardoConst.getDbName();
+	private static final String CONNECTION_URL = Constants.tomasConst.getDbUrl();
+	private static final String DB_KEY = Constants.tomasConst.getDbKey();
+	private static final String DB_NAME = Constants.tomasConst.getDbName();
 	private static Shorts instance;
 	private static RedisCache cache = RedisCache.getInstance(); // Cache instance
-	public static boolean CACHE_MODE = Constants.eduardoConst.isCacheActive();
+	public static boolean CACHE_MODE = Constants.tomasConst.isCacheActive();
 
-	public static String DB_MODE = Constants.eduardoConst.getDbMode();
+	public static String DB_MODE = Constants.tomasConst.getDbMode();
 
 	synchronized public static Shorts getInstance() {
 		if (instance != null)
@@ -111,14 +111,14 @@ public class JavaShorts implements Shorts {
 			return errorOrResult(okUser(userId, password), user -> {
 
 				var shortId = format("%s+%s", userId, UUID.randomUUID());
-				var blobUrl = format("%s/%s/%s", TukanoRestServer.serverURI, Blobs.NAME, shortId);
+				var blobUrl = format("/%s/%s",  Blobs.NAME, shortId);
 				var shrt = new Short(shortId, userId, blobUrl);
 
-				var blobUrl1 = URI.create(shrt.getBlobUrl());
-				var token = blobUrl1.getQuery().split("=")[1];
-				JavaBlobs.getInstance().upload(blobUrl ,randomBytes( 100 ),token );
+//				var blobUrl1 = URI.create(shrt.getBlobUrl());
+//				var token = blobUrl1.getQuery().split("=")[1];
+//				JavaBlobs.getInstance().upload(blobUrl ,randomBytes( 100 ),token );
 				// Save in DB and Cache
-				errorOrValue(DB.insertOne(shrt), s -> s.copyWithLikes_And_Token(0));
+				errorOrValue(DB.insertOne(shrt) ,shrt);
 
 				// Cache the short after creation
 				if (CACHE_MODE) {
@@ -134,7 +134,7 @@ public class JavaShorts implements Shorts {
 		return errorOrResult(okUser(userId, password), user -> {
 			try {
 				var shortId = format("%s+%s", userId, UUID.randomUUID());
-				var blobUrl = format("%s/%s/%s", TukanoRestServer.serverURI, Blobs.NAME, shortId);
+				var blobUrl = format("/%s/%s",  Blobs.NAME, shortId);
 				var shrt = new Short(shortId, userId, blobUrl);
 
 				initShorts();
@@ -175,8 +175,7 @@ public class JavaShorts implements Shorts {
 			return error(BAD_REQUEST);
 		}
 
-		// First, check if the short is cached
-		if (CACHE_MODE) {
+ 		if (CACHE_MODE) {
 			var cacheKey = "shorts:" + shortId;
 			Short cachedShort = cache.getValue(cacheKey, Short.class);
 			if (cachedShort != null) {
@@ -184,8 +183,12 @@ public class JavaShorts implements Shorts {
 				return Result.ok(cachedShort);
 			}
 		}
-
-		try {
+		if(DB_MODE.equalsIgnoreCase("post")){
+			var query = format("SELECT count(*) FROM Likes l WHERE l.shortId = '%s'", shortId);
+			var likes = DB.sql(query, Long.class);
+			return errorOrValue( getOne(shortId, Short.class), shrt -> shrt.copyWithLikes_And_Token( likes.get(0)));
+		}
+			try {
 			initShorts();
 			CosmosItemResponse<ShortDAO> response = shorts.readItem(shortId, new PartitionKey(shortId), ShortDAO.class);
 			ShortDAO shortDAO = response.getItem();
@@ -214,21 +217,25 @@ public class JavaShorts implements Shorts {
 		Log.info(() -> format("deleteShort : shortId = %s, pwd = %s\n", shortId, password));
 
 		if (DB_MODE.equalsIgnoreCase("post")) {
+
 			return errorOrResult(getShort(shortId), shrt ->
 					errorOrResult(okUser(shrt.getOwnerId(), password), user ->
-							DB.transaction(hibernate -> {
-								hibernate.remove(shrt);
-								// Invalidate cache after deletion
+
+							errorOrResult(DB.deleteOne(shrt), result -> {
+
 								if (CACHE_MODE) {
 									var cacheKey = "shorts:" + shortId;
 									cache.delete(cacheKey);
 									Log.info(() -> format("Cache invalidated for short: %s", shortId));
 								}
-								var query = format("DELETE Likes l WHERE l.shortId = '%s'", shortId);
-								hibernate.createNativeQuery(query, Likes.class).executeUpdate();
-								JavaBlobs.getInstance().delete(shrt.getBlobUrl(), Token.get());
-							})));
+
+								return Result.ok();
+							})
+					)
+			);
 		}
+
+
 
 		return errorOrResult(getShort(shortId), shrt -> {
 			return errorOrResult(okUser(shrt.getOwnerId(), password), user -> {
@@ -274,8 +281,10 @@ public class JavaShorts implements Shorts {
 		Log.info(() -> format("getShorts : userId = %s\n", userId));
 
 		if(DB_MODE.equalsIgnoreCase("post")){
-			var query = format("SELECT s.shortId FROM Short s WHERE s.ownerId = '%s'", userId);
-			return errorOrValue( okUser(userId), DB.sql( query, String.class));
+			if(okUser(userId).isOK()) {
+				var query = format("SELECT s.shortId FROM Short s WHERE s.ownerId = '%s'", userId);
+				return errorOrValue(okUser(userId), DB.sql(query, String.class));
+			}
 		}
 
 		try {
@@ -394,21 +403,17 @@ public class JavaShorts implements Shorts {
 					initLikes();
 					LikesDAO like = new LikesDAO(userId, shortId, shrt.getOwnerId());
 
-					// If the user likes the short, add the like
-					if (isLiked) {
+ 					if (isLiked) {
 						CosmosItemResponse<LikesDAO> response = likes.createItem(like);
 
 						Log.info(() -> format("Liked item created: %s", response.getItem()));
 
-						// Increment the totalLikes in the shorts container
-						updateTotalLikes(shortId, 1);
+ 						updateTotalLikes(shortId, 1);
 					} else {
-						// If the user unlikes the short, remove the like
-						likes.deleteItem(like.getId(), new PartitionKey(like.getId()), new CosmosItemRequestOptions());
+ 						likes.deleteItem(like.getId(), new PartitionKey(like.getId()), new CosmosItemRequestOptions());
 						Log.info(() -> format("Like item deleted for: %s", like.getId()));
 
-						// Decrement the totalLikes in the shorts container
-						updateTotalLikes(shortId, -1);
+ 						updateTotalLikes(shortId, -1);
 					}
 
 					return Result.ok();
@@ -421,23 +426,19 @@ public class JavaShorts implements Shorts {
 		});
 	}
 
-	// Helper method to update the totalLikes field in the shorts container
-	private void updateTotalLikes(String shortId, int likeChange) {
+ 	private void updateTotalLikes(String shortId, int likeChange) {
 		try {
 			// Read the current short from the Cosmos DB
 			initShorts();
 			CosmosItemResponse<ShortDAO> response = shorts.readItem(shortId, new PartitionKey(shortId), ShortDAO.class);
 			ShortDAO shortDAO = response.getItem();
 
-			// Update the totalLikes field
-			int newTotalLikes = shortDAO.getTotalLikes() + likeChange;
+ 			int newTotalLikes = shortDAO.getTotalLikes() + likeChange;
 			shortDAO.setTotalLikes(newTotalLikes);
 
-			// Update the short in the database
-			shorts.replaceItem(shortDAO, shortId, new PartitionKey(shortId), new CosmosItemRequestOptions());
+ 			shorts.replaceItem(shortDAO, shortId, new PartitionKey(shortId), new CosmosItemRequestOptions());
 
-			// Update the cache after modifying the totalLikes
-			if (CACHE_MODE) {
+ 			if (CACHE_MODE) {
 				var cacheKey = "shorts:" + shortId;
 				cache.setValue(cacheKey, shortDAO.toShort());  // Ensure the cache reflects the updated totalLikes
 				Log.info(() -> format("Cache data updated for short: %s with new totalLikes: %d", shortId, newTotalLikes));
@@ -465,16 +466,16 @@ public class JavaShorts implements Shorts {
 		return errorOrResult(getShort(shortId), shrt -> {
 			return errorOrResult(okUser(shrt.getOwnerId(), password), user -> {
 				try {
-					initLikes(); // Ensure we are using the "likes" container
+					initLikes();
 
-					// Define the SQL query to get users who liked the short
+
 					String query = String.format("SELECT l.userId FROM Likes l WHERE l.shortId = '%s'", shortId);
 					SqlQuerySpec querySpec = new SqlQuerySpec(query);
 
-					// Execute the query against the Cosmos DB
+
 					CosmosPagedIterable<LikesDAO> queryResults = likes.queryItems(querySpec, new CosmosQueryRequestOptions(), LikesDAO.class);
 
-					// Collect user IDs who liked the short
+
 					List<String> userIds = new ArrayList<>();
 					queryResults.forEach(like -> userIds.add(like.getUserId()));
 

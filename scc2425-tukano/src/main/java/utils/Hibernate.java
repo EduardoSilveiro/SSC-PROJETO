@@ -50,6 +50,7 @@ public class Hibernate {
 
 	public Result<Void> persistOne(Object  obj) {
 		return execute( (hibernate) -> {
+
 			hibernate.persist( obj );
 		});
 	}

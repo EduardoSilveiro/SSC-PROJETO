@@ -1,0 +1,6 @@
+# Date : 10/14/24, 10:16 AM
+BlobStoreConnection=DefaultEndpointsProtocol=https;AccountName=tukanoblobs;AccountKey=t/vJrseyyTQVU0k6x/+VBAvThsdBHotCIFTvgXSFYJ95bmNi3vaIHWj/D6/WPMiA8rVlwb8QG+Tz+AStbsOFkQ==;EndpointSuffix=core.windows.net
+COSMOSDB_KEY=6ulvzuHDBQgk09jceF0n5jtApjYKwJWY07RHYtJOelaZvdDj2niTMewPaG9Q4qe66Re0RTEe64yJACDbaKwEIg==
+COSMOSDB_URL=https://tukanocosmos72287.documents.azure.com:443/
+COSMOSDB_DATABASE=scc2324
+

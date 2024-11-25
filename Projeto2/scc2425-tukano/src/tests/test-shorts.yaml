@@ -1,0 +1,23 @@
+config:
+  target: http://127.0.0.1:8080/tukano/rest
+  phases:
+    - name: test-shorts
+      duration: 1
+      arrivalRate: 1
+
+scenarios:
+  - name: ShortsOperations
+    flow:
+        # Create a Short
+        - post:
+            url: /shorts/wales?pwd=12345
+        # Delete a Short
+        - delete:
+            headers:
+              Content-Type: application/json
+            url: /shorts/TesteCriar1+36541e06-e5c6-438b-beac-ec6cafe17ef3?pwd=nova
+        # Get a Short
+        - get:
+            headers:
+              Content-Type: application/json
+            url: /shorts/TesteCriar1+054ff713-86c7-44b2-988e-350eeab1ee0a/likes?pwd=nova

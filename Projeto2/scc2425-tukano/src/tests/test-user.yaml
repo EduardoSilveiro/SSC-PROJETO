@@ -1,0 +1,52 @@
+config:
+  target: http://127.0.0.1:8080/tukano/rest
+  phases:
+    - name: User-Tests
+      duration: 1
+      arrivalRate: 1
+
+scenarios:
+  - name: TuKanoRegister
+    flow:
+      # 1. Criar User (/users/{userId}) DONE
+      - post:
+          url: /users/
+          headers:
+            Content-Type: application/json
+          json:
+            userId: "TesteCriar1" # this parameter is filled from the fields above
+            pwd: "password"
+            email: "email "
+            displayName: "displayName"
+
+      # 2. Obter User (GET /users/{userId}) DONE
+      - get:
+          url: /users/TesteCriar1?pwd=password
+          headers:
+            Content-Type: application/json
+
+      # 3. Atualizar User (PUT /users/{userId}) DONE
+      - put:
+          url: /users/TesteCriar1?pwd=password
+          headers:
+            Content-Type: application/json
+          json:
+            userId: "TesteCriar1"
+            pwd: "newpassword"
+            email: "UpdatedUser@gmail.com"
+            displayName: "NewDisplayName"
+
+#      # 4. Buscar User (GET /users?query={pattern})
+      - get:
+          url: /users?query=Teste
+          headers:
+            Content-Type: application/json
+
+
+      # 5. Excluir User (DELETE /users/{userId}) DONE
+      - delete:
+          url: /users/TesteCriar1?pwd=password
+          headers:
+            Content-Type: application/json
+
+

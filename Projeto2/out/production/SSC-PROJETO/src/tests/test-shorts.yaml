@@ -1,0 +1,13 @@
+config:
+  target: http://127.0.0.1:8080/tukano/rest
+  phases:
+    - name: test-shorts
+      duration: 1
+      arrivalRate: 1
+
+scenarios:
+  - name: ShortsOperations
+    flow:
+        # Create a Short
+        - post:
+            url: /shorts/wales?pwd=12345
